@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/api.ts","./src/auth.ts","./src/main.tsx","./src/pages/ForgotPasswordPage.tsx","./src/pages/HomePage.tsx","./src/pages/LoginPage.tsx","./src/pages/RegisterPage.tsx","./src/pages/ResetPasswordPage.tsx","./src/pages/VerifyEmailPage.tsx","./src/pages/workspaceTypes.ts"],"version":"5.6.3"}

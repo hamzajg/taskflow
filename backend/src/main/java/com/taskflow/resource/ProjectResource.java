@@ -13,9 +13,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import java.util.List;
 
+@Tag(name = "Projects")
 @Path("/workspaces/{workspaceId}/projects")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -41,11 +44,13 @@ public class ProjectResource {
     }
 
     @GET
+    @Operation(summary = "List projects in a workspace")
     public List<ProjectDto> list(@PathParam("workspaceId") Long workspaceId) {
         return projectService.listFor(currentUser(), workspaceId);
     }
 
     @POST
+    @Operation(summary = "Create a project")
     public Response create(@PathParam("workspaceId") Long workspaceId,
                            @Valid CreateProjectRequest req) {
         ProjectDto dto = projectService.create(currentUser(), workspaceId,
@@ -55,6 +60,7 @@ public class ProjectResource {
 
     @GET
     @Path("/{id}")
+    @Operation(summary = "Get a project")
     public ProjectDto get(@PathParam("id") Long id) {
         var ref = projectService.requireProject(id, currentUser().id);
         return ProjectDto.of(ref.project(), com.taskflow.model.Task.count("projectId", id));
@@ -62,12 +68,14 @@ public class ProjectResource {
 
     @PUT
     @Path("/{id}")
+    @Operation(summary = "Update a project (owner/admin)")
     public ProjectDto update(@PathParam("id") Long id, @Valid UpdateProjectRequest req) {
         return projectService.update(currentUser(), id, req.name(), req.description(), req.color());
     }
 
     @DELETE
     @Path("/{id}")
+    @Operation(summary = "Delete a project (owner/admin, cascades tasks)")
     public Response delete(@PathParam("id") Long id) {
         projectService.delete(currentUser(), id);
         return Response.noContent().build();

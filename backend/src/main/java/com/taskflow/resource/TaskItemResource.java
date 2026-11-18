@@ -13,9 +13,13 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+
 
 import java.time.LocalDate;
 
+@Tag(name = "Tasks")
 @Path("/tasks")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -49,12 +53,14 @@ public class TaskItemResource {
 
     @GET
     @Path("/{id}")
+    @Operation(summary = "Get a task")
     public TaskDto get(@PathParam("id") Long id) {
         return taskService.get(currentUser(), id);
     }
 
     @PATCH
     @Path("/{id}")
+    @Operation(summary = "Update a task fields (status change moves to column end)")
     public TaskDto update(@PathParam("id") Long id, @Valid UpdateTaskRequest req) {
         return taskService.update(currentUser(), id, req.title(), req.description(),
                 req.status(), req.priority(), req.assigneeId(),
@@ -63,6 +69,7 @@ public class TaskItemResource {
 
     @DELETE
     @Path("/{id}")
+    @Operation(summary = "Delete a task")
     public Response delete(@PathParam("id") Long id) {
         taskService.delete(currentUser(), id);
         return Response.noContent().build();
@@ -70,6 +77,7 @@ public class TaskItemResource {
 
     @PATCH
     @Path("/{id}/move")
+    @Operation(summary = "Move a task to a status column at a position")
     public MoveResult move(@PathParam("id") Long id, @Valid MoveTaskRequest req) {
         return taskService.move(currentUser(), id, req.status(),
                 req.position() == null ? -1 : req.position());

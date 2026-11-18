@@ -13,10 +13,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Tag(name = "Tasks")
 @Path("/projects/{projectId}/tasks")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -45,11 +49,13 @@ public class TaskResource {
     }
 
     @GET
+    @Operation(summary = "List tasks in a project")
     public List<TaskDto> list(@PathParam("projectId") Long projectId) {
         return taskService.listForProject(currentUser(), projectId);
     }
 
     @POST
+    @Operation(summary = "Create a task")
     public Response create(@PathParam("projectId") Long projectId,
                            @Valid CreateTaskRequest req) {
         TaskDto dto = taskService.create(currentUser(), projectId, req.title(),

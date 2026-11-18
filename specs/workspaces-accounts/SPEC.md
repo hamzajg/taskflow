@@ -87,13 +87,14 @@ can exist.
   stack, `workspace_members` as the single tenancy choke point (verified:
   every workspace endpoint funnels through `requireMembership`/
   `requireRole` with server-side `workspace_id` filtering + 403 test).
-  Recorded tradeoffs: stateless JWT means logout does NOT invalidate
-  already-issued tokens (≤1h window) — accepted for v1 under the
-  re-login interpretation of AC4; `token_version` revocation (challenger
-  option A2) deferred. Revisit D3 on any stolen/expired-session incident,
-  a compliance requirement for immediate revocation, or if AC4 is audited
-  as requiring server-side invalidation; revisit D4 (→ RLS/schema-per-
-  tenant) only if a second service or tenant growth makes app-level
-  filtering the bottleneck. Follow-ups noted by the review: member-role
-  denial tests (folds into US5/wave 4), invite email-mismatch negative
-  test, invite token not leaked to non-invitees.
+  Recorded tradeoffs: stateless JWT + `token_version` claim — logout and
+  password reset increment the user's version, so previously issued
+  tokens are rejected immediately (implemented during validation; closes
+  the AC4 gap the review flagged). Remaining stateless tradeoff: no
+  per-token revocation list — version bump revokes ALL sessions for the
+  user. Revisit D3 if per-session revocation or refresh tokens are ever
+  needed; revisit D4 (→ RLS/schema-per-tenant) only if a second service
+  or tenant growth makes app-level filtering the bottleneck. Follow-ups
+  noted by the review are done: member-role denial tests (wave 3/4),
+  invite email-mismatch negative test, pending invites hidden from
+  members (403).

@@ -122,6 +122,10 @@ public class AuthResourceTest {
     public void forgot_and_reset_password() {
         given().contentType(ContentType.JSON).body(registerPayload("reset@example.com"))
                 .when().post("/auth/register").then().statusCode(201);
+        String oldJwt = given().contentType(ContentType.JSON)
+                .body("{\"email\":\"reset@example.com\",\"password\":\"secret123\"}")
+                .when().post("/auth/login")
+                .then().statusCode(200).extract().path("token");
 
         given().contentType(ContentType.JSON).body("{\"email\":\"reset@example.com\"}")
                 .when().post("/auth/forgot-password")
@@ -139,6 +143,39 @@ public class AuthResourceTest {
                 .body("{\"email\":\"reset@example.com\",\"password\":\"new-secret-1\"}")
                 .when().post("/auth/login")
                 .then().statusCode(200);
+
+        // Password reset revokes every previously issued token.
+        given().header("Authorization", "Bearer " + oldJwt)
+                .when().get("/auth/me")
+                .then().statusCode(401);
+    }
+
+    @Test
+    public void logout_invalidates_the_session() {
+        given().contentType(ContentType.JSON).body(registerPayload("out@example.com"))
+                .when().post("/auth/register").then().statusCode(201);
+        String token = extractTokenFromEmail("out@example.com");
+        given().queryParam("token", token)
+                .when().get("/auth/verify-email").then().statusCode(200);
+        String jwt = given().contentType(ContentType.JSON)
+                .body("{\"email\":\"out@example.com\",\"password\":\"secret123\"}")
+                .when().post("/auth/login")
+                .then().statusCode(200).extract().path("token");
+
+        given().header("Authorization", "Bearer " + jwt)
+                .when().get("/workspaces")
+                .then().statusCode(200);
+
+        given().header("Authorization", "Bearer " + jwt).contentType(ContentType.JSON)
+                .when().post("/auth/logout")
+                .then().statusCode(204);
+
+        given().header("Authorization", "Bearer " + jwt)
+                .when().get("/auth/me")
+                .then().statusCode(401);
+        given().header("Authorization", "Bearer " + jwt)
+                .when().get("/workspaces")
+                .then().statusCode(401);
     }
 
     @Test

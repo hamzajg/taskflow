@@ -115,7 +115,9 @@ public class WorkspaceResource {
     }
 
     private User currentUser() {
-        User user = authService.requireUser(Long.valueOf(jwt.getSubject()));
+        Object tv = jwt.getClaim("tv");
+        User user = authService.requireUser(Long.valueOf(jwt.getSubject()),
+                tv == null ? null : Long.valueOf(tv.toString()));
         workspaceService.requireVerified(user);
         return user;
     }

@@ -70,11 +70,8 @@ public class AuthService {
     }
 
     @Transactional
-    public void resendVerification(Long userId) {
-        User user = User.findById(userId);
-        if (user == null) {
-            throw new WebApplicationException("User not found", Response.Status.NOT_FOUND);
-        }
+    public void resendVerification(Long userId, Long tokenVersion) {
+        User user = requireUser(userId, tokenVersion);
         if (user.isVerified()) {
             throw new WebApplicationException("Email already verified", Response.Status.CONFLICT);
         }
@@ -107,26 +104,35 @@ public class AuthService {
         user.password = JwtService.hashPassword(newPassword);
         user.resetToken = null;
         user.resetTokenExpiresAt = null;
+        user.tokenVersion++;
     }
 
     @Transactional
-    public UserDto updateProfile(Long userId, String firstName, String lastName) {
-        User user = User.findById(userId);
-        if (user == null) {
-            throw new WebApplicationException("User not found", Response.Status.NOT_FOUND);
-        }
+    public UserDto updateProfile(Long userId, Long tokenVersion, String firstName, String lastName) {
+        User user = requireUser(userId, tokenVersion);
         user.firstName = firstName.trim();
         user.lastName = lastName.trim();
         user.updatedAt = Instant.now();
         return UserDto.of(user);
     }
 
-    public User requireUser(Long id) {
+    public User requireUser(Long id, Long tokenVersion) {
         User user = User.findById(id);
         if (user == null) {
             throw new WebApplicationException("User not found", Response.Status.NOT_FOUND);
         }
+        if (tokenVersion == null || tokenVersion != user.tokenVersion) {
+            throw new WebApplicationException("Session expired", Response.Status.UNAUTHORIZED);
+        }
         return user;
+    }
+
+    @Transactional
+    public void logout(Long userId) {
+        User user = User.findById(userId);
+        if (user != null) {
+            user.tokenVersion++;
+        }
     }
 
     private void sendVerificationEmail(User user) {

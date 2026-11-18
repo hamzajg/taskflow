@@ -1,6 +1,9 @@
 package com.taskflow;
 
 import com.taskflow.model.User;
+import com.taskflow.model.Workspace;
+import com.taskflow.model.WorkspaceInvite;
+import com.taskflow.model.WorkspaceMember;
 import io.quarkus.mailer.MockMailbox;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
@@ -27,6 +30,9 @@ public class AuthResourceTest {
     @Transactional
     void clean() {
         mailbox.clear();
+        WorkspaceInvite.deleteAll();
+        WorkspaceMember.deleteAll();
+        Workspace.deleteAll();
         User.deleteAll();
     }
 

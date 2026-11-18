@@ -1,6 +1,9 @@
 import { FormEvent, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
+import Button from '../components/Button'
+import Card from '../components/Card'
+import Input from '../components/Input'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -13,7 +16,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="auth-card">
+    <Card className="auth-card">
       <h1>Reset password</h1>
       {sent ? (
         <p className="muted">
@@ -22,16 +25,20 @@ export default function ForgotPasswordPage() {
         </p>
       ) : (
         <form onSubmit={onSubmit}>
-          <label>
-            Email
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          </label>
-          <button type="submit">Send reset link</button>
+          <Input
+            label="Email"
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <Button type="submit">Send reset link</Button>
         </form>
       )}
       <p className="muted">
         <Link to="/login">Back to sign in</Link>
       </p>
-    </div>
+    </Card>
   )
 }

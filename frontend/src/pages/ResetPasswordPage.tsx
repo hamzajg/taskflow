@@ -1,6 +1,10 @@
 import { FormEvent, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api, ApiError } from '../api'
+import Alert from '../components/Alert'
+import Button from '../components/Button'
+import Card from '../components/Card'
+import Input from '../components/Input'
 
 export default function ResetPasswordPage() {
   const [params] = useSearchParams()
@@ -23,27 +27,33 @@ export default function ResetPasswordPage() {
 
   if (done) {
     return (
-      <div className="auth-card">
+      <Card className="auth-card">
         <h1>Password updated</h1>
-        <button onClick={() => navigate('/login')}>Sign in</button>
-      </div>
+        <Button onClick={() => navigate('/login')}>Sign in</Button>
+      </Card>
     )
   }
 
   return (
-    <div className="auth-card">
+    <Card className="auth-card">
       <h1>Choose a new password</h1>
-      {error && <div className="error">{error}</div>}
+      {error && <Alert>{error}</Alert>}
       <form onSubmit={onSubmit}>
-        <label>
-          New password (min 8 chars)
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} required />
-        </label>
-        <button type="submit">Update password</button>
+        <Input
+          label="New password"
+          hint="Minimum 8 characters"
+          type="password"
+          autoComplete="new-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          minLength={8}
+          required
+        />
+        <Button type="submit">Update password</Button>
       </form>
       <p className="muted">
         <Link to="/login">Back to sign in</Link>
       </p>
-    </div>
+    </Card>
   )
 }

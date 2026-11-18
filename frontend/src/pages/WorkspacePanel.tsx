@@ -1,5 +1,11 @@
 import { FormEvent, useCallback, useEffect, useState } from 'react'
 import { api, ApiError } from '../api'
+import Alert from '../components/Alert'
+import Badge from '../components/Badge'
+import Button from '../components/Button'
+import Card from '../components/Card'
+import Input from '../components/Input'
+import Select from '../components/Select'
 import { WorkspaceDto } from './workspaceTypes'
 
 interface Member {
@@ -14,6 +20,12 @@ interface Invite {
   email: string
   role: string
   token: string
+}
+
+const ROLE_TONES: Record<string, 'primary' | 'success' | 'neutral'> = {
+  owner: 'primary',
+  admin: 'success',
+  member: 'neutral',
 }
 
 export default function WorkspacePanel({
@@ -104,62 +116,70 @@ export default function WorkspacePanel({
 
   const openWs = workspaces.find((w) => w.id === openId)
   const canManage = openWs && ['owner', 'admin'].includes(openWs.role)
-  const isOwner = openWs?.role === 'owner' 
+  const isOwner = openWs?.role === 'owner'
 
   return (
-    <section>
-      <h2>Workspaces</h2>
-      {error && <div className="error">{error}</div>}
+    <Card title="Workspaces">
+      {error && <Alert>{error}</Alert>}
       <form className="inline-form" onSubmit={create}>
-        <input
-          placeholder="New workspace name"
+        <Input
+          label="New workspace"
+          placeholder="Workspace name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
-        <button type="submit">Create</button>
+        <Button type="submit">Create</Button>
       </form>
 
       <ul className="ws-list">
         {workspaces.map((w) => (
           <li key={w.id}>
-            <button className="link" onClick={() => setOpenId(openId === w.id ? null : w.id)}>
+            <Button variant="link" onClick={() => setOpenId(openId === w.id ? null : w.id)}>
               {w.name}
-            </button>{' '}
+            </Button>
+            <Badge tone={ROLE_TONES[w.role] ?? 'neutral'}>{w.role}</Badge>
             <span className="muted">
-              {w.role} · {w.memberCount} member{w.memberCount === 1 ? '' : 's'}
+              {w.memberCount} member{w.memberCount === 1 ? '' : 's'}
             </span>
           </li>
         ))}
       </ul>
 
       {openWs && (
-        <div className="panel">
+        <div className="subpanel">
           <h3>{openWs.name} — members</h3>
           {canManage && (
             <form className="inline-form" onSubmit={rename}>
-              <input
-                placeholder="Rename workspace"
+              <Input
+                label="Rename workspace"
+                placeholder="New name"
                 value={renameTo}
                 onChange={(e) => setRenameTo(e.target.value)}
                 required
               />
-              <button type="submit">Rename</button>
+              <Button type="submit" variant="secondary">
+                Rename
+              </Button>
             </form>
           )}
           {isOwner && (
-            <button className="link" onClick={destroy}>
-              delete workspace
-            </button>
+            <Button variant="danger" size="sm" onClick={destroy}>
+              Delete workspace
+            </Button>
           )}
           <ul>
             {members.map((m) => (
               <li key={m.userId}>
-                {m.displayName} <span className="muted">{m.email} · {m.role}</span>{' '}
+                {m.displayName}{' '}
+                <span className="muted">
+                  {m.email} · {m.role}
+                </span>{' '}
+                <Badge tone={ROLE_TONES[m.role] ?? 'neutral'}>{m.role}</Badge>{' '}
                 {canManage && m.role !== 'owner' && (
-                  <button className="link" onClick={() => removeMember(m.userId)}>
-                    remove
-                  </button>
+                  <Button variant="link" size="sm" onClick={() => removeMember(m.userId)}>
+                    Remove
+                  </Button>
                 )}
               </li>
             ))}
@@ -169,18 +189,24 @@ export default function WorkspacePanel({
             <>
               <h4>Invite member</h4>
               <form className="inline-form" onSubmit={invite}>
-                <input
+                <Input
+                  label="Email"
                   type="email"
                   placeholder="email@example.com"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   required
                 />
-                <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)}>
-                  <option value="member">member</option>
-                  <option value="admin">admin</option>
-                </select>
-                <button type="submit">Invite</button>
+                <Select
+                  label="Role"
+                  value={inviteRole}
+                  onChange={(e) => setInviteRole(e.target.value)}
+                  options={[
+                    { value: 'member', label: 'Member' },
+                    { value: 'admin', label: 'Admin' },
+                  ]}
+                />
+                <Button type="submit">Invite</Button>
               </form>
               {invites.length > 0 && (
                 <>
@@ -188,7 +214,7 @@ export default function WorkspacePanel({
                   <ul>
                     {invites.map((i) => (
                       <li key={i.id}>
-                        {i.email} <span className="muted">{i.role}</span>
+                        {i.email} <Badge>{i.role}</Badge>
                       </li>
                     ))}
                   </ul>
@@ -198,6 +224,6 @@ export default function WorkspacePanel({
           )}
         </div>
       )}
-    </section>
+    </Card>
   )
 }

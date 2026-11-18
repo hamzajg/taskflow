@@ -14,17 +14,14 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class WorkspaceService {
-
-    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Inject
     AuthService authService;
@@ -83,10 +80,19 @@ public class WorkspaceService {
     }
 
     public List<WorkspaceDto> listFor(User user) {
-        return WorkspaceMember.<WorkspaceMember>list("userId", user.id).stream()
+        List<WorkspaceMember> memberships = WorkspaceMember.list("userId", user.id);
+        if (memberships.isEmpty()) {
+            return List.of();
+        }
+        List<Long> wsIds = memberships.stream().map(m -> m.workspaceId).toList();
+        Map<Long, Workspace> workspaces = Workspace.<Workspace>list("id in ?1", wsIds).stream()
+                .collect(Collectors.toMap(w -> w.id, w -> w));
+        Map<Long, Long> counts = WorkspaceMember.countGroupedByWorkspace(wsIds);
+        return memberships.stream()
                 .map(m -> {
-                    Workspace ws = Workspace.findById(m.workspaceId);
-                    return ws == null ? null : toDto(ws, m.role);
+                    Workspace ws = workspaces.get(m.workspaceId);
+                    return ws == null ? null
+                            : new WorkspaceDto(ws.id, ws.name, m.role, counts.getOrDefault(ws.id, 0L));
                 })
                 .filter(java.util.Objects::nonNull)
                 .toList();
@@ -111,10 +117,15 @@ public class WorkspaceService {
     }
 
     public List<MemberDto> members(User user, Long workspaceId) {
-        Membership mb = requireMembership(workspaceId, user.id);
-        return WorkspaceMember.<WorkspaceMember>list("workspaceId", workspaceId).stream()
+        requireMembership(workspaceId, user.id);
+        List<WorkspaceMember> rows = WorkspaceMember.list("workspaceId", workspaceId);
+        List<Long> userIds = rows.stream().map(m -> m.userId).toList();
+        Map<Long, User> users = userIds.isEmpty() ? Map.of()
+                : User.<User>list("id in ?1", userIds).stream()
+                        .collect(Collectors.toMap(u -> u.id, u -> u));
+        return rows.stream()
                 .map(m -> {
-                    User u = User.findById(m.userId);
+                    User u = users.get(m.userId);
                     return u == null ? null
                             : new MemberDto(u.id, u.displayName(), u.email, m.role);
                 })
@@ -154,7 +165,7 @@ public class WorkspaceService {
                 && !mb.member().role.equals(WorkspaceMember.ROLE_OWNER)) {
             throw new WebApplicationException("Only the owner can grant the admin role", Response.Status.FORBIDDEN);
         }
-        User invitee = User.find("lower(email) = ?1", normalized).firstResult();
+        User invitee = User.findByEmail(normalized);
         boolean alreadyMember = invitee != null && WorkspaceMember.count(
                 "workspaceId = ?1 and userId = ?2", workspaceId, invitee.id) > 0;
         if (alreadyMember) {
@@ -164,7 +175,7 @@ public class WorkspaceService {
         invite.workspaceId = workspaceId;
         invite.email = normalized;
         invite.role = inviteRole;
-        invite.token = newToken();
+        invite.token = Tokens.newToken();
         invite.invitedBy = user.id;
         invite.expiresAt = Instant.now().plus(7, ChronoUnit.DAYS);
         invite.persist();
@@ -225,10 +236,16 @@ public class WorkspaceService {
         return toDto(ws, m.role);
     }
 
+    /** DTO for an already-resolved membership (used by the GET endpoint). */
+    public WorkspaceDto dtoFor(Membership mb) {
+        return toDto(mb.workspace(), mb.member().role);
+    }
+
     private WorkspaceDto toDto(Workspace ws, String role) {
         long count = WorkspaceMember.count("workspaceId", ws.id);
         return new WorkspaceDto(ws.id, ws.name, role, count);
     }
+
 
     /** Returns the canonical role, or null when the value is not assignable via invite. */
     private static String sanitizeRole(String role) {
@@ -240,11 +257,5 @@ public class WorkspaceService {
             case WorkspaceMember.ROLE_MEMBER, WorkspaceMember.ROLE_ADMIN -> normalized;
             default -> null;
         };
-    }
-
-    private static String newToken() {
-        byte[] bytes = new byte[32];
-        RANDOM.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes) + "-" + UUID.randomUUID();
     }
 }

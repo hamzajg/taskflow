@@ -154,6 +154,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
       )}
 
       <div className="shell-main">
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
         <header className="topbar">
           <Button
             variant="link"
@@ -178,7 +181,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           </Button>
           {user && <span className="muted topbar-user">{`${user.firstName} ${user.lastName}`}</span>}
         </header>
-        <main className="content">
+        <main className="content" id="main">
           <ShellProvider value={shell}>{children}</ShellProvider>
         </main>
       </div>

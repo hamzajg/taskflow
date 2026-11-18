@@ -2,6 +2,10 @@ import { FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api, ApiError } from '../api'
 import { AuthResponse, setSession } from '../auth'
+import Alert from '../components/Alert'
+import Button from '../components/Button'
+import Card from '../components/Card'
+import Input from '../components/Input'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -22,24 +26,32 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="auth-card">
+    <Card className="auth-card">
       <h1>TaskFlow</h1>
       <p className="muted">Sign in to your workspace</p>
-      {error && <div className="error">{error}</div>}
+      {error && <Alert>{error}</Alert>}
       <form onSubmit={onSubmit}>
-        <label>
-          Email
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        </label>
-        <label>
-          Password
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        </label>
-        <button type="submit">Log in</button>
+        <Input
+          label="Email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <Input
+          label="Password"
+          type="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <Button type="submit">Log in</Button>
       </form>
       <p className="muted">
         <Link to="/forgot-password">Forgot password?</Link> · <Link to="/register">Create account</Link>
       </p>
-    </div>
+    </Card>
   )
 }

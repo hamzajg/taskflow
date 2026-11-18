@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { api, ApiError } from '../api'
+import Alert from '../components/Alert'
+import Card from '../components/Card'
 
 export default function VerifyEmailPage() {
   const [params] = useSearchParams()
@@ -27,7 +29,7 @@ export default function VerifyEmailPage() {
   }, [params])
 
   return (
-    <div className="auth-card">
+    <Card className="auth-card">
       <h1>Email verification</h1>
       {state === 'loading' && <p className="muted">Verifying…</p>}
       {state === 'ok' && (
@@ -38,10 +40,10 @@ export default function VerifyEmailPage() {
       )}
       {state === 'error' && (
         <>
-          <div className="error">{message}</div>
+          <Alert>{message}</Alert>
           <Link to="/login">Back to sign in</Link>
         </>
       )}
-    </div>
+    </Card>
   )
 }

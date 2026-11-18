@@ -2,6 +2,10 @@ import { FormEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api, ApiError } from '../api'
 import { clearSession, getUser, saveUser, User } from '../auth'
+import Alert from '../components/Alert'
+import Button from '../components/Button'
+import Card from '../components/Card'
+import Input from '../components/Input'
 import { WorkspaceDto } from './workspaceTypes'
 import WorkspacePanel from './WorkspacePanel'
 
@@ -54,40 +58,39 @@ export default function HomePage() {
         <strong>TaskFlow</strong>
         <span className="spacer" />
         <span className="muted">{user ? `${user.firstName} ${user.lastName}` : ''}</span>
-        <button className="link" onClick={logout}>
+        <Button variant="link" onClick={logout}>
           Log out
-        </button>
+        </Button>
       </header>
       <main className="content">
         <h1>Welcome{user ? `, ${user.firstName}` : ''}</h1>
         {!user?.verified && (
-          <p className="error">Please verify your email to use workspace features.</p>
+          <Alert tone="warning">Please verify your email to use workspace features.</Alert>
         )}
         <WorkspacePanel workspaces={workspaces} onChanged={loadWorkspaces} />
-        <section className="panel">
-          <h3>Profile</h3>
-          {profileErr && <div className="error">{profileErr}</div>}
-          {profileMsg && <p className="muted">{profileMsg}</p>}
+        <Card title="Profile">
+          {profileErr && <Alert>{profileErr}</Alert>}
+          {profileMsg && <Alert tone="success">{profileMsg}</Alert>}
           <form className="profile-form" onSubmit={saveProfile}>
-            <label>
-              First name
-              <input
-                value={profile.firstName}
-                onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
-                required
-              />
-            </label>
-            <label>
-              Last name
-              <input
-                value={profile.lastName}
-                onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
-                required
-              />
-            </label>
-            <button type="submit">Save profile</button>
+            <Input
+              label="First name"
+              autoComplete="given-name"
+              value={profile.firstName}
+              onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
+              required
+            />
+            <Input
+              label="Last name"
+              autoComplete="family-name"
+              value={profile.lastName}
+              onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
+              required
+            />
+            <div>
+              <Button type="submit">Save profile</Button>
+            </div>
           </form>
-        </section>
+        </Card>
       </main>
     </div>
   )

@@ -1,8 +1,8 @@
 # Delivery Loop — app-shell
 
-Status: running
+Status: done
 Iterations: 1
-Updated: 2026-11-18T01:44:08Z
+Updated: 2026-11-18T01:51:55Z
 
 | Wave | Status | Branch | PR | Evidence | Updated |
 |------|--------|--------|----|----------|---------|
@@ -29,3 +29,4 @@ Updated: 2026-11-18T01:44:08Z
 - 2026-11-18T01:43:31Z complete wave 3 (#10): npm run build clean; theme persists across reload (verified dark); 4 screenshots in evidence bundle; AC-4/AC-5 met
 - 2026-11-18T01:44:08Z start wave 4 on feat/app-shell-w4
 - 2026-11-18T01:44:08Z complete wave 4 (#11): npm run build clean; skip-link + focus/aria verified; 3 screenshots in evidence bundle; AC-6/AC-7 met
+- 2026-11-18T01:51:55Z feature validated and shipped

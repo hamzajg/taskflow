@@ -6,6 +6,7 @@ import VerifyEmailPage from './pages/VerifyEmailPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import HomePage from './pages/HomePage'
+import AppShell from './components/AppShell'
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   return isLoggedIn() ? children : <Navigate to="/login" replace />
@@ -23,7 +24,9 @@ export default function App() {
         path="/"
         element={
           <RequireAuth>
-            <HomePage />
+            <AppShell>
+              <HomePage />
+            </AppShell>
           </RequireAuth>
         }
       />

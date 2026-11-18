@@ -1,0 +1,176 @@
+import { ReactNode, useCallback, useEffect, useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { FolderKanban, LayoutDashboard, LogOut, Menu, User as UserIcon, X } from 'lucide-react'
+import { api } from '../api'
+import { clearSession, getUser, saveUser, User } from '../auth'
+import Button from './Button'
+import { ShellProvider, ShellState } from '../shell/ShellContext'
+import { WorkspaceDto } from '../pages/workspaceTypes'
+
+interface NavEntry {
+  label: string
+  icon: ReactNode
+  to?: string
+  hash?: string
+}
+
+const NAV: NavEntry[] = [
+  { label: 'Dashboard', icon: <LayoutDashboard size={18} />, to: '/' },
+  { label: 'Workspaces', icon: <FolderKanban size={18} />, hash: '#workspaces' },
+  { label: 'Profile', icon: <UserIcon size={18} />, hash: '#profile' },
+]
+
+export default function AppShell({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(getUser())
+  const [workspaces, setWorkspaces] = useState<WorkspaceDto[]>([])
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState<number | null>(null)
+  const [navOpen, setNavOpen] = useState(false)
+  const navigate = useNavigate()
+
+  const refreshWorkspaces = useCallback(() => {
+    api.get<WorkspaceDto[]>('/workspaces').then(setWorkspaces).catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    api.get<User>('/auth/me')
+      .then((u) => {
+        setUser(u)
+        saveUser(u)
+      })
+      .catch(() => {})
+    refreshWorkspaces()
+  }, [refreshWorkspaces])
+
+  function logout() {
+    api.post('/auth/logout').catch(() => {})
+    clearSession()
+    navigate('/login')
+  }
+
+  const shell: ShellState = {
+    user,
+    workspaces,
+    activeWorkspaceId,
+    setActiveWorkspaceId,
+    refreshWorkspaces,
+    setUser,
+    logout,
+  }
+
+  const initials = user ? `${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}` : ''
+
+  return (
+    <div className="app-shell">
+      <aside className={`sidebar${navOpen ? ' open' : ''}`} aria-label="Main navigation">
+        <div className="sidebar-brand">
+          <FolderKanban size={20} />
+          <span>TaskFlow</span>
+          <Button
+            variant="link"
+            size="sm"
+            className="sidebar-close"
+            aria-label="Close navigation"
+            onClick={() => setNavOpen(false)}
+          >
+            <X size={18} />
+          </Button>
+        </div>
+
+        <nav className="sidebar-nav">
+          {NAV.map((item) =>
+            item.to ? (
+              <NavLink
+                key={item.label}
+                to={item.to}
+                end
+                className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                onClick={() => setNavOpen(false)}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </NavLink>
+            ) : (
+              <a
+                key={item.label}
+                href={item.hash}
+                className="nav-link"
+                onClick={() => setNavOpen(false)}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </a>
+            ),
+          )}
+        </nav>
+
+        {workspaces.length > 0 && (
+          <div className="sidebar-workspaces">
+            <label className="field-label" htmlFor="ws-switcher">
+              Workspace
+            </label>
+            <select
+              id="ws-switcher"
+              className="field-input"
+              value={activeWorkspaceId ?? ''}
+              onChange={(e) =>
+                setActiveWorkspaceId(e.target.value === '' ? null : Number(e.target.value))
+              }
+            >
+              <option value="">Select a workspace…</option>
+              {workspaces.map((w) => (
+                <option key={w.id} value={w.id}>
+                  {w.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {user && (
+          <div className="sidebar-user">
+            <span className="avatar" aria-hidden="true">
+              {initials}
+            </span>
+            <div className="sidebar-user-info">
+              <strong>{`${user.firstName} ${user.lastName}`}</strong>
+              <span className="muted">{user.email}</span>
+            </div>
+            <Button
+              variant="link"
+              size="sm"
+              aria-label="Log out"
+              onClick={logout}
+            >
+              <LogOut size={16} />
+            </Button>
+          </div>
+        )}
+      </aside>
+
+      {navOpen && (
+        <div className="sidebar-overlay" onClick={() => setNavOpen(false)} aria-hidden="true" />
+      )}
+
+      <div className="shell-main">
+        <header className="topbar">
+          <Button
+            variant="link"
+            size="sm"
+            className="nav-toggle"
+            aria-label="Open navigation"
+            aria-expanded={navOpen}
+            onClick={() => setNavOpen(true)}
+          >
+            <Menu size={20} />
+          </Button>
+          <span className="topbar-title">TaskFlow</span>
+          <span className="spacer" />
+          {user && <span className="muted topbar-user">{`${user.firstName} ${user.lastName}`}</span>}
+        </header>
+        <main className="content">
+          <ShellProvider value={shell}>{children}</ShellProvider>
+        </main>
+      </div>
+    </div>
+  )
+}

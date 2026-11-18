@@ -2,14 +2,14 @@
   "feature": "app-shell",
   "status": "running",
   "iterations": 1,
-  "updated": "2026-11-18T01:38:18Z",
+  "updated": "2026-11-18T01:40:59Z",
   "waves": {
     "1": {
-      "status": "in-progress",
+      "status": "done",
       "branch": "feat/app-shell-w1",
-      "pr": "\u2014",
-      "evidence": "\u2014",
-      "updated": "2026-11-18T01:38:18Z"
+      "pr": "#8",
+      "evidence": "npm run build clean; 4 UI screenshots in evidence bundle; AC-1/AC-2 met",
+      "updated": "2026-11-18T01:40:59Z"
     }
   },
   "gates": {
@@ -22,6 +22,7 @@
   "events": [
     "2026-11-18T01:37:23Z gate G1 met: specs/app-shell/DECISION-REVIEW.md",
     "2026-11-18T01:38:12Z gate G1 met: specs/app-shell/DECISION-REVIEW.md",
-    "2026-11-18T01:38:18Z start wave 1 on feat/app-shell-w1"
+    "2026-11-18T01:38:18Z start wave 1 on feat/app-shell-w1",
+    "2026-11-18T01:40:59Z complete wave 1 (#8): npm run build clean; 4 UI screenshots in evidence bundle; AC-1/AC-2 met"
   ]
 }

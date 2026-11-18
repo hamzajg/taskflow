@@ -13,17 +13,13 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
-import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
-import java.util.UUID;
 
 @ApplicationScoped
 public class AuthService {
 
     private static final Logger LOG = Logger.getLogger(AuthService.class);
-    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Inject
     Mailer mailer;
@@ -36,7 +32,7 @@ public class AuthService {
 
     @Transactional
     public UserDto register(String firstName, String lastName, String email, String password) {
-        if (User.count("lower(email) = ?1", email.toLowerCase()) > 0) {
+        if (User.findByEmail(email) != null) {
             throw new WebApplicationException("Email already registered", Response.Status.CONFLICT);
         }
         User user = new User();
@@ -44,15 +40,21 @@ public class AuthService {
         user.lastName = lastName.trim();
         user.email = email.toLowerCase();
         user.password = JwtService.hashPassword(password);
-        user.verificationToken = newToken();
-        user.persist();
+        user.verificationToken = Tokens.newToken();
+        try {
+            user.persist();
+            User.getEntityManager().flush();
+        } catch (jakarta.persistence.PersistenceException e) {
+            // Concurrent registration hit the unique email constraint.
+            throw new WebApplicationException("Email already registered", Response.Status.CONFLICT);
+        }
         sendVerificationEmail(user);
         return UserDto.of(user);
     }
 
     @Transactional
     public AuthResponse login(String email, String password) {
-        User user = User.find("lower(email) = ?1", email.toLowerCase()).firstResult();
+        User user = User.findByEmail(email);
         if (user == null || !JwtService.checkPassword(password, user.password)) {
             throw new WebApplicationException("Invalid email or password", Response.Status.UNAUTHORIZED);
         }
@@ -75,18 +77,18 @@ public class AuthService {
         if (user.isVerified()) {
             throw new WebApplicationException("Email already verified", Response.Status.CONFLICT);
         }
-        user.verificationToken = newToken();
+        user.verificationToken = Tokens.newToken();
         sendVerificationEmail(user);
     }
 
     @Transactional
     public void forgotPassword(String email) {
-        User user = User.find("lower(email) = ?1", email.toLowerCase()).firstResult();
+        User user = User.findByEmail(email);
         // Always return success to avoid account enumeration.
         if (user == null) {
             return;
         }
-        user.resetToken = newToken();
+        user.resetToken = Tokens.newToken();
         user.resetTokenExpiresAt = Instant.now().plus(1, ChronoUnit.HOURS);
         sendMail(user.email, "Reset your TaskFlow password",
                 "Use this link to reset your password (valid 1 hour):\n\n"
@@ -149,11 +151,5 @@ public class AuthService {
             // Dev environments may lack SMTP — log the message so flows remain testable.
             LOG.warnf(e, "Failed to send email to %s (subject: %s). Body: %s", to, subject, body);
         }
-    }
-
-    private static String newToken() {
-        byte[] bytes = new byte[32];
-        RANDOM.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes) + "-" + UUID.randomUUID();
     }
 }

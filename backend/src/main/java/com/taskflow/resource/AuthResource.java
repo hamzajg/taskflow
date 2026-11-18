@@ -2,6 +2,7 @@ package com.taskflow.resource;
 
 import com.taskflow.dto.AuthDtos.*;
 import com.taskflow.model.User;
+import com.taskflow.security.SessionClaims;
 import com.taskflow.service.AuthService;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
@@ -9,21 +10,17 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.jboss.logging.Logger;
 
 @Path("/auth")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class AuthResource {
 
-    private static final Logger LOG = Logger.getLogger(AuthResource.class);
-
     @Inject
     AuthService authService;
 
     @Inject
-    JsonWebToken jwt;
+    SessionClaims claims;
 
     @POST
     @Path("/register")
@@ -52,7 +49,7 @@ public class AuthResource {
     @Path("/resend-verification")
     @Authenticated
     public Response resendVerification() {
-        authService.resendVerification(currentUserId(), currentTokenVersion());
+        authService.resendVerification(claims.userId(), claims.tokenVersion());
         return Response.ok(new Message("Verification email sent")).build();
     }
 
@@ -74,38 +71,25 @@ public class AuthResource {
     @Path("/me")
     @Authenticated
     public UserDto me() {
-        return UserDto.of(authService.requireUser(currentUserId(), currentTokenVersion()));
+        return UserDto.of(authService.requireUser(claims.userId(), claims.tokenVersion()));
     }
 
     @PUT
     @Path("/profile")
     @Authenticated
     public UserDto updateProfile(@Valid ProfileUpdateRequest req) {
-        return authService.updateProfile(currentUserId(), currentTokenVersion(), req.firstName(), req.lastName());
+        return authService.updateProfile(claims.userId(), claims.tokenVersion(), req.firstName(), req.lastName());
     }
 
     @POST
     @Path("/logout")
     @Authenticated
     public Response logout() {
-        authService.logout(currentUserId());
+        authService.logout(claims.userId());
         return Response.noContent().build();
     }
 
     public record Message(String message) {
     }
 
-    private Long currentUserId() {
-        try {
-            return Long.valueOf(jwt.getSubject());
-        } catch (Exception e) {
-            LOG.warn("Invalid token subject", e);
-            throw new WebApplicationException("Invalid token", Response.Status.UNAUTHORIZED);
-        }
-    }
-
-    private Long currentTokenVersion() {
-        Object tv = jwt.getClaim("tv");
-        return tv == null ? null : Long.valueOf(tv.toString());
-    }
 }

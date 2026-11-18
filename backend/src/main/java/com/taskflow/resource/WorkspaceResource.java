@@ -2,6 +2,7 @@ package com.taskflow.resource;
 
 import com.taskflow.dto.AuthDtos.*;
 import com.taskflow.model.User;
+import com.taskflow.security.SessionClaims;
 import com.taskflow.service.AuthService;
 import com.taskflow.service.WorkspaceService;
 import io.quarkus.security.Authenticated;
@@ -11,7 +12,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ public class WorkspaceResource {
     AuthService authService;
 
     @Inject
-    JsonWebToken jwt;
+    SessionClaims claims;
 
     public record CreateWorkspaceRequest(@NotBlank String name) {
     }
@@ -58,8 +58,7 @@ public class WorkspaceResource {
     @Path("/{id}")
     public WorkspaceDto get(@PathParam("id") Long id) {
         var mb = workspaceService.requireMembership(id, currentUser().id);
-        return new WorkspaceDto(mb.workspace().id, mb.workspace().name, mb.member().role,
-                com.taskflow.model.WorkspaceMember.count("workspaceId", id));
+        return workspaceService.dtoFor(mb);
     }
 
     @PUT
@@ -115,9 +114,7 @@ public class WorkspaceResource {
     }
 
     private User currentUser() {
-        Object tv = jwt.getClaim("tv");
-        User user = authService.requireUser(Long.valueOf(jwt.getSubject()),
-                tv == null ? null : Long.valueOf(tv.toString()));
+        User user = authService.requireUser(claims.userId(), claims.tokenVersion());
         workspaceService.requireVerified(user);
         return user;
     }

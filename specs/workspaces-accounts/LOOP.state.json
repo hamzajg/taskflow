@@ -2,7 +2,7 @@
   "feature": "workspaces-accounts",
   "status": "running",
   "iterations": 1,
-  "updated": "2026-11-18T00:24:13Z",
+  "updated": "2026-11-18T00:25:58Z",
   "waves": {
     "1": {
       "status": "done",
@@ -17,6 +17,13 @@
       "pr": "#2",
       "evidence": "backend 10/10 tests, frontend build clean",
       "updated": "2026-11-18T00:02:58Z"
+    },
+    "3": {
+      "status": "in-progress",
+      "branch": "feat/workspaces-accounts-w3",
+      "pr": "\u2014",
+      "evidence": "\u2014",
+      "updated": "2026-11-18T00:25:58Z"
     }
   },
   "gates": {
@@ -43,6 +50,7 @@
     "2026-11-17T23:59:51Z complete wave 1 (#1): backend mvn test 6/6, frontend npm run build OK",
     "2026-11-17T23:59:54Z start wave 2 on feat/workspaces-accounts-w2",
     "2026-11-18T00:02:58Z complete wave 2 (#2): backend 10/10 tests, frontend build clean",
-    "2026-11-18T00:24:13Z gate G5 met: file:specs/workspaces-accounts/DECISION-REVIEW.md \u2014 verdict REVISE, outcome recorded as D6"
+    "2026-11-18T00:24:13Z gate G5 met: file:specs/workspaces-accounts/DECISION-REVIEW.md \u2014 verdict REVISE, outcome recorded as D6",
+    "2026-11-18T00:25:58Z start wave 3 on feat/workspaces-accounts-w3"
   ]
 }

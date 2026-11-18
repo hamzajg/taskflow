@@ -28,6 +28,10 @@ export function setSession(res: AuthResponse) {
   localStorage.setItem(USER_KEY, JSON.stringify(res.user))
 }
 
+export function saveUser(user: User) {
+  localStorage.setItem(USER_KEY, JSON.stringify(user))
+}
+
 export function clearSession() {
   localStorage.removeItem(TOKEN_KEY)
   localStorage.removeItem(USER_KEY)

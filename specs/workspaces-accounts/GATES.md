@@ -42,3 +42,14 @@
 - Blocking: yes
 - Check: command:cd frontend && npm run build
 - Why: the SPA must compile and bundle cleanly before the feature is done.
+
+## G5 — Design decisions challenged
+- Before: plan
+- Type: artifact
+- Owner: agent
+- Resolver: agent
+- Blocking: yes
+- Check: file:specs/workspaces-accounts/DECISION-REVIEW.md
+- Why: the stack, tenancy, and auth decisions (D1–D4) are inherited by
+  every wave; the challenger review must exist before waves lock the
+  design in.

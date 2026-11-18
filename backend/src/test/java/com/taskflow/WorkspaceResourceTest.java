@@ -1,0 +1,155 @@
+package com.taskflow;
+
+import io.quarkus.mailer.MockMailbox;
+import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.*;
+
+@QuarkusTest
+public class WorkspaceResourceTest {
+
+    private static final String PASS = "secret123";
+
+    @Inject
+    MockMailbox mailbox;
+
+    @BeforeEach
+    void clearMail() {
+        mailbox.clear();
+    }
+
+    /** Register + verify via the real email-token flow + login. */
+    private Response registerVerifyLogin(String email, String first, String last) {
+        given().contentType(ContentType.JSON)
+                .body("""
+                        {"firstName":"%s","lastName":"%s","email":"%s","password":"%s"}
+                        """.formatted(first, last, email, PASS))
+                .when().post("/auth/register").then().statusCode(201);
+
+        var messages = mailbox.getMailsSentTo(email);
+        assertFalse(messages.isEmpty(), "expected verification email for " + email);
+        String body = messages.get(messages.size() - 1).getText();
+        Matcher m = Pattern.compile("token=([A-Za-z0-9_\\-]+)").matcher(body);
+        assertTrue(m.find());
+        given().queryParam("token", m.group(1))
+                .when().get("/auth/verify-email").then().statusCode(200);
+
+        return given().contentType(ContentType.JSON)
+                .body("{\"email\":\"" + email + "\",\"password\":\"" + PASS + "\"}")
+                .when().post("/auth/login").then().statusCode(200)
+                .extract().response();
+    }
+
+    private static String bearer(Response login) {
+        return "Bearer " + login.jsonPath().getString("token");
+    }
+
+    @Test
+    public void create_workspace_makes_caller_owner() {
+        Response login = registerVerifyLogin("owner1@example.com", "Olivia", "Owner");
+        String auth = bearer(login);
+
+        given().header("Authorization", auth).contentType(ContentType.JSON)
+                .body("{\"name\":\"Acme Team\"}")
+                .when().post("/workspaces")
+                .then().statusCode(201)
+                .body("name", equalTo("Acme Team"))
+                .body("role", equalTo("owner"))
+                .body("memberCount", equalTo(1));
+
+        given().header("Authorization", auth)
+                .when().get("/workspaces")
+                .then().statusCode(200)
+                .body("$", hasSize(1));
+    }
+
+    @Test
+    public void invite_accept_and_member_removal_flow() {
+        Response ownerLogin = registerVerifyLogin("boss@example.com", "Bob", "Boss");
+        String ownerAuth = bearer(ownerLogin);
+        long wsId = ((Number) given().header("Authorization", ownerAuth).contentType(ContentType.JSON)
+                .body("{\"name\":\"Studio\"}")
+                .when().post("/workspaces").then().statusCode(201)
+                .extract().path("id")).longValue();
+
+        Response memberLogin = registerVerifyLogin("member@example.com", "Mia", "Member");
+        String memberAuth = bearer(memberLogin);
+
+        String inviteToken = given().header("Authorization", ownerAuth).contentType(ContentType.JSON)
+                .body("{\"email\":\"member@example.com\",\"role\":\"member\"}")
+                .when().post("/workspaces/" + wsId + "/invites")
+                .then().statusCode(201)
+                .extract().path("token");
+        assertNotNull(inviteToken);
+
+        given().header("Authorization", memberAuth).contentType(ContentType.JSON)
+                .body("{\"token\":\"" + inviteToken + "\"}")
+                .when().post("/workspaces/invites/accept")
+                .then().statusCode(200)
+                .body("id", equalTo((int) wsId))
+                .body("role", equalTo("member"));
+
+        given().header("Authorization", memberAuth)
+                .when().get("/workspaces")
+                .then().statusCode(200)
+                .body("$", hasSize(1));
+
+        given().header("Authorization", ownerAuth)
+                .when().get("/workspaces/" + wsId + "/members")
+                .then().statusCode(200)
+                .body("$", hasSize(2));
+
+        long memberId = memberLogin.jsonPath().getLong("user.id");
+        given().header("Authorization", ownerAuth)
+                .when().delete("/workspaces/" + wsId + "/members/" + memberId)
+                .then().statusCode(204);
+
+        given().header("Authorization", memberAuth)
+                .when().get("/workspaces/" + wsId + "/members")
+                .then().statusCode(403);
+    }
+
+    @Test
+    public void non_member_cannot_access_workspace() {
+        registerVerifyLogin("a@example.com", "Ann", "A");
+        Response strangerLogin = registerVerifyLogin("stranger@example.com", "Sid", "Stranger");
+        String strangerAuth = bearer(strangerLogin);
+
+        Response ownerLogin = registerVerifyLogin("b@example.com", "Ben", "B");
+        long wsId = ((Number) given().header("Authorization", bearer(ownerLogin)).contentType(ContentType.JSON)
+                .body("{\"name\":\"Private\"}")
+                .when().post("/workspaces").then().statusCode(201)
+                .extract().path("id")).longValue();
+
+        given().header("Authorization", strangerAuth)
+                .when().get("/workspaces/" + wsId)
+                .then().statusCode(403);
+    }
+
+    @Test
+    public void unverified_user_cannot_create_workspace() {
+        given().contentType(ContentType.JSON)
+                .body("{\"firstName\":\"New\",\"lastName\":\"User\",\"email\":\"unv@example.com\",\"password\":\"secret123\"}")
+                .when().post("/auth/register").then().statusCode(201);
+        String jwt = given().contentType(ContentType.JSON)
+                .body("{\"email\":\"unv@example.com\",\"password\":\"secret123\"}")
+                .when().post("/auth/login").then().statusCode(200)
+                .extract().path("token");
+
+        given().header("Authorization", "Bearer " + jwt).contentType(ContentType.JSON)
+                .body("{\"name\":\"Nope\"}")
+                .when().post("/workspaces")
+                .then().statusCode(403);
+    }
+}

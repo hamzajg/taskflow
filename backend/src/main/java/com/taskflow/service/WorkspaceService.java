@@ -134,6 +134,10 @@ public class WorkspaceService {
         if (target.role.equals(WorkspaceMember.ROLE_OWNER)) {
             throw new WebApplicationException("Cannot remove the owner", Response.Status.CONFLICT);
         }
+        if (target.role.equals(WorkspaceMember.ROLE_ADMIN)
+                && !mb.member().role.equals(WorkspaceMember.ROLE_OWNER)) {
+            throw new WebApplicationException("Only the owner can remove an admin", Response.Status.FORBIDDEN);
+        }
         target.delete();
     }
 
@@ -145,6 +149,10 @@ public class WorkspaceService {
         String inviteRole = sanitizeRole(role);
         if (inviteRole == null) {
             throw new WebApplicationException("Invalid role", Response.Status.BAD_REQUEST);
+        }
+        if (WorkspaceMember.ROLE_ADMIN.equals(inviteRole)
+                && !mb.member().role.equals(WorkspaceMember.ROLE_OWNER)) {
+            throw new WebApplicationException("Only the owner can grant the admin role", Response.Status.FORBIDDEN);
         }
         User invitee = User.find("lower(email) = ?1", normalized).firstResult();
         boolean alreadyMember = invitee != null && WorkspaceMember.count(

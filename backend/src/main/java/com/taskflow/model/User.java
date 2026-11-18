@@ -35,6 +35,9 @@ public class User extends PanacheEntity {
     @Column(name = "reset_token_expires_at")
     public Instant resetTokenExpiresAt;
 
+    @Column(name = "token_version", nullable = false)
+    public int tokenVersion;
+
     @Column(name = "created_at", nullable = false)
     public Instant createdAt = Instant.now();
 

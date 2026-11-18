@@ -26,6 +26,7 @@ public class JwtService {
                 .issuer("taskflow")
                 .subject(String.valueOf(user.id))
                 .claim("email", user.email)
+                .claim("tv", user.tokenVersion)
                 .expiresIn(3600)
                 .sign(privateKey);
     }

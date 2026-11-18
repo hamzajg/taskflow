@@ -1,0 +1,27 @@
+{
+  "feature": "app-shell",
+  "status": "running",
+  "iterations": 1,
+  "updated": "2026-11-18T01:38:18Z",
+  "waves": {
+    "1": {
+      "status": "in-progress",
+      "branch": "feat/app-shell-w1",
+      "pr": "\u2014",
+      "evidence": "\u2014",
+      "updated": "2026-11-18T01:38:18Z"
+    }
+  },
+  "gates": {
+    "G1": {
+      "status": "met",
+      "evidence": "specs/app-shell/DECISION-REVIEW.md",
+      "updated": "2026-11-18T01:38:12Z"
+    }
+  },
+  "events": [
+    "2026-11-18T01:37:23Z gate G1 met: specs/app-shell/DECISION-REVIEW.md",
+    "2026-11-18T01:38:12Z gate G1 met: specs/app-shell/DECISION-REVIEW.md",
+    "2026-11-18T01:38:18Z start wave 1 on feat/app-shell-w1"
+  ]
+}

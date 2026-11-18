@@ -2,6 +2,10 @@ import { FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api, ApiError } from '../api'
 import { User } from '../auth'
+import Alert from '../components/Alert'
+import Button from '../components/Button'
+import Card from '../components/Card'
+import Input from '../components/Input'
 
 export default function RegisterPage() {
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '' })
@@ -22,14 +26,14 @@ export default function RegisterPage() {
 
   if (done) {
     return (
-      <div className="auth-card">
+      <Card className="auth-card">
         <h1>Check your email</h1>
         <p className="muted">
           We sent a verification link to <strong>{form.email}</strong>. Verify your
           email to activate workspace features, then sign in.
         </p>
-        <button onClick={() => navigate('/login')}>Go to sign in</button>
-      </div>
+        <Button onClick={() => navigate('/login')}>Go to sign in</Button>
+      </Card>
     )
   }
 
@@ -37,31 +41,47 @@ export default function RegisterPage() {
     setForm({ ...form, [k]: e.target.value })
 
   return (
-    <div className="auth-card">
+    <Card className="auth-card">
       <h1>Create your account</h1>
-      {error && <div className="error">{error}</div>}
+      {error && <Alert>{error}</Alert>}
       <form onSubmit={onSubmit}>
-        <label>
-          First name
-          <input value={form.firstName} onChange={set('firstName')} required />
-        </label>
-        <label>
-          Last name
-          <input value={form.lastName} onChange={set('lastName')} required />
-        </label>
-        <label>
-          Email
-          <input type="email" value={form.email} onChange={set('email')} required />
-        </label>
-        <label>
-          Password (min 8 chars)
-          <input type="password" value={form.password} onChange={set('password')} minLength={8} required />
-        </label>
-        <button type="submit">Register</button>
+        <Input
+          label="First name"
+          autoComplete="given-name"
+          value={form.firstName}
+          onChange={set('firstName')}
+          required
+        />
+        <Input
+          label="Last name"
+          autoComplete="family-name"
+          value={form.lastName}
+          onChange={set('lastName')}
+          required
+        />
+        <Input
+          label="Email"
+          type="email"
+          autoComplete="email"
+          value={form.email}
+          onChange={set('email')}
+          required
+        />
+        <Input
+          label="Password"
+          hint="Minimum 8 characters"
+          type="password"
+          autoComplete="new-password"
+          value={form.password}
+          onChange={set('password')}
+          minLength={8}
+          required
+        />
+        <Button type="submit">Register</Button>
       </form>
       <p className="muted">
         Already have an account? <Link to="/login">Sign in</Link>
       </p>
-    </div>
+    </Card>
   )
 }

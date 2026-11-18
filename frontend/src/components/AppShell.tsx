@@ -1,10 +1,11 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { FolderKanban, LayoutDashboard, LogOut, Menu, User as UserIcon, X } from 'lucide-react'
+import { FolderKanban, LayoutDashboard, LogOut, Menu, Moon, Sun, User as UserIcon, X } from 'lucide-react'
 import { api } from '../api'
 import { clearSession, getUser, saveUser, User } from '../auth'
 import Button from './Button'
 import { ShellProvider, ShellState } from '../shell/ShellContext'
+import { getTheme, Theme, toggleTheme } from '../theme'
 import { WorkspaceDto } from '../pages/workspaceTypes'
 
 interface NavEntry {
@@ -25,6 +26,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const [workspaces, setWorkspaces] = useState<WorkspaceDto[]>([])
   const [activeWorkspaceId, setActiveWorkspaceId] = useState<number | null>(null)
   const [navOpen, setNavOpen] = useState(false)
+  const [theme, setTheme] = useState<Theme>(getTheme)
   const navigate = useNavigate()
 
   const refreshWorkspaces = useCallback(() => {
@@ -165,6 +167,15 @@ export default function AppShell({ children }: { children: ReactNode }) {
           </Button>
           <span className="topbar-title">TaskFlow</span>
           <span className="spacer" />
+          <Button
+            variant="link"
+            size="sm"
+            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            title={theme === 'dark' ? 'Light theme' : 'Dark theme'}
+            onClick={() => setTheme(toggleTheme())}
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </Button>
           {user && <span className="muted topbar-user">{`${user.firstName} ${user.lastName}`}</span>}
         </header>
         <main className="content">

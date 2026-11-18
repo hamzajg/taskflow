@@ -146,9 +146,9 @@ public class WorkspaceService {
         Membership mb = requireMembership(workspaceId, user.id);
         requireRole(mb, WorkspaceMember.ROLE_OWNER, WorkspaceMember.ROLE_ADMIN);
         String normalized = email.toLowerCase();
-        boolean alreadyMember = WorkspaceMember.count(
-                "workspaceId = ?1 and userId in (select id from users where lower(email) = ?2)",
-                workspaceId, normalized) > 0;
+        User invitee = User.find("lower(email) = ?1", normalized).firstResult();
+        boolean alreadyMember = invitee != null && WorkspaceMember.count(
+                "workspaceId = ?1 and userId = ?2", workspaceId, invitee.id) > 0;
         if (alreadyMember) {
             throw new WebApplicationException("User is already a member", Response.Status.CONFLICT);
         }

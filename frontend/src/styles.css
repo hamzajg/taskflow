@@ -106,3 +106,40 @@ a {
   margin: 0 auto;
   width: 100%;
 }
+
+.inline-form {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.inline-form input,
+.inline-form select {
+  padding: 8px 10px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.ws-list {
+  list-style: none;
+  padding: 0;
+}
+
+.ws-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.panel {
+  margin-top: 16px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #e3e6ea;
+  border-radius: 10px;
+}
+
+.panel h3,
+.panel h4 {
+  margin: 8px 0;
+}

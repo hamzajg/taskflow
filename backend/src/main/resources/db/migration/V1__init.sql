@@ -44,7 +44,13 @@ CREATE TABLE workspace_invites (
 CREATE INDEX idx_workspace_invites_email ON workspace_invites(email);
 
 -- Hibernate AUTO generation expects <table>_seq sequences on Postgres.
+-- The pooled optimizer allocates blocks of 50, so the sequences must
+-- increment by 50 to stay in lockstep (otherwise ids collide on restart).
 ALTER SEQUENCE users_id_seq RENAME TO users_seq;
+ALTER SEQUENCE users_seq INCREMENT BY 50;
 ALTER SEQUENCE workspaces_id_seq RENAME TO workspaces_seq;
+ALTER SEQUENCE workspaces_seq INCREMENT BY 50;
 ALTER SEQUENCE workspace_members_id_seq RENAME TO workspace_members_seq;
+ALTER SEQUENCE workspace_members_seq INCREMENT BY 50;
 ALTER SEQUENCE workspace_invites_id_seq RENAME TO workspace_invites_seq;
+ALTER SEQUENCE workspace_invites_seq INCREMENT BY 50;

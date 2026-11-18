@@ -2,14 +2,21 @@
   "feature": "workspaces-accounts",
   "status": "running",
   "iterations": 1,
-  "updated": "2026-11-17T23:58:39Z",
+  "updated": "2026-11-17T23:59:54Z",
   "waves": {
     "1": {
-      "status": "in-progress",
+      "status": "done",
       "branch": "feat/workspaces-accounts-w1",
+      "pr": "#1",
+      "evidence": "backend mvn test 6/6, frontend npm run build OK",
+      "updated": "2026-11-17T23:59:51Z"
+    },
+    "2": {
+      "status": "in-progress",
+      "branch": "feat/workspaces-accounts-w2",
       "pr": "\u2014",
       "evidence": "\u2014",
-      "updated": "2026-11-17T23:58:39Z"
+      "updated": "2026-11-17T23:59:54Z"
     }
   },
   "gates": {
@@ -27,6 +34,8 @@
   "events": [
     "2026-11-17T23:35:02Z gate G1 met: specs/workspaces-accounts/SPEC.md filled: problem/users/12 AC/5 decisions",
     "2026-11-17T23:58:37Z gate G2 met: cd backend && mvn -q -DskipTests compile: OK; mvn test: 6/6 pass, app boots + Flyway migrates on Postgres 16 (compose db",
-    "2026-11-17T23:58:39Z start wave 1 on feat/workspaces-accounts-w1"
+    "2026-11-17T23:58:39Z start wave 1 on feat/workspaces-accounts-w1",
+    "2026-11-17T23:59:51Z complete wave 1 (#1): backend mvn test 6/6, frontend npm run build OK",
+    "2026-11-17T23:59:54Z start wave 2 on feat/workspaces-accounts-w2"
   ]
 }

@@ -18,7 +18,7 @@ function walk(dir: string, out: string[] = []): string[] {
 }
 
 const files = walk(SRC)
-const HEX = /#[0-9a-fA-F]{3,8}\b/
+const HEX = /#[0-9a-fA-F]{3,8}\b|rgba?\(/
 
 describe('Design tokens are the single source of styling', () => {
   it('defines the core tokens in tokens.css', () => {

@@ -2,6 +2,7 @@
 
 | Feature | Stories | Scenarios | Waves | Planned | Validated |
 |---------|---------|-----------|-------|---------|-----------|
+| app-shell (`app-shell/`) | 4 | 8 | 4 | yes | yes |
 | workspaces-accounts (`workspaces-accounts/`) | 6 | 12 | 4 | yes | yes |
 
 

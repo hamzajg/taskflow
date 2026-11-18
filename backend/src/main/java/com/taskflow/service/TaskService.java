@@ -121,6 +121,8 @@ public class TaskService {
         t.assigneeId = assigneeId;
         t.dueDate = dueDate;
         t.createdBy = user.id;
+        // Serialize position assignment per project, same as move/delete.
+        getEntityManager().find(Project.class, projectId, LockModeType.PESSIMISTIC_WRITE);
         t.position = (int) Task.count("projectId = ?1 and status = ?2", projectId, st);
         t.persist();
         return toDtos(List.of(t)).get(0);
@@ -180,6 +182,7 @@ public class TaskService {
         ProjectRef ref = requireTaskProject(taskId, user.id);
         Task t = Task.findById(taskId);
         String status = t.status;
+        getEntityManager().find(Project.class, ref.project().id, LockModeType.PESSIMISTIC_WRITE);
         Task.deleteById(taskId);
         compactColumn(ref.project().id, status);
     }

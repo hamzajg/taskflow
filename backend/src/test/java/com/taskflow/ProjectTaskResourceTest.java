@@ -314,4 +314,47 @@ public class ProjectTaskResourceTest {
                 .when().get("/projects/" + projOwner + "/tasks")
                 .then().statusCode(404);
     }
+
+    // Move endpoint position math: cross-column insert + same-column reorder
+    @Test
+    public void move_rewrites_positions_dense() {
+        Response login = registerVerifyLogin("mv@example.com", "Mov", "Er");
+        String auth = bearer(login);
+        long wsId = createWorkspace(auth, "Move WS");
+        long projectId = createProject(auth, wsId, "Move Proj");
+
+        long a = createTask(auth, projectId, "{\"title\":\"A\",\"status\":\"todo\"}");
+        long b = createTask(auth, projectId, "{\"title\":\"B\",\"status\":\"todo\"}");
+        long c = createTask(auth, projectId, "{\"title\":\"C\",\"status\":\"todo\"}");
+
+        // move A to in_progress at position 0
+        given().header("Authorization", auth).contentType(ContentType.JSON)
+                .body("{\"status\":\"in_progress\",\"position\":0}")
+                .when().patch("/tasks/" + a + "/move")
+                .then().statusCode(200)
+                .body("task.status", equalTo("in_progress"))
+                .body("task.position", equalTo(0))
+                .body("column", hasSize(1));
+
+        // todo column compacted: B=0, C=1
+        given().header("Authorization", auth)
+                .when().get("/projects/" + projectId + "/tasks")
+                .then().statusCode(200)
+                .body("find { it.title == 'B' }.position", equalTo(0))
+                .body("find { it.title == 'C' }.position", equalTo(1));
+
+        // reorder within todo: move C to position 0 -> C=0, B=1
+        given().header("Authorization", auth).contentType(ContentType.JSON)
+                .body("{\"status\":\"todo\",\"position\":0}")
+                .when().patch("/tasks/" + c + "/move")
+                .then().statusCode(200)
+                .body("column.find { it.title == 'C' }.position", equalTo(0))
+                .body("column.find { it.title == 'B' }.position", equalTo(1));
+
+        // invalid status rejected, state unchanged
+        given().header("Authorization", auth).contentType(ContentType.JSON)
+                .body("{\"status\":\"bogus\",\"position\":0}")
+                .when().patch("/tasks/" + b + "/move")
+                .then().statusCode(400);
+    }
 }

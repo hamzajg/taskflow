@@ -1,8 +1,8 @@
 # Delivery Loop — workspaces-accounts
 
-Status: running
+Status: done
 Iterations: 2
-Updated: 2026-11-18T00:44:16Z
+Updated: 2026-11-18T00:46:37Z
 
 | Wave | Status | Branch | PR | Evidence | Updated |
 |------|--------|--------|----|----------|---------|
@@ -36,3 +36,4 @@ Updated: 2026-11-18T00:44:16Z
 - 2026-11-18T00:44:12Z complete wave 4 (#4): backend 17/17 tests, frontend build clean; admin RBAC boundaries + rename/delete UI
 - 2026-11-18T00:44:16Z gate G3 met: mvn test: AuthResourceTest 6/6, WorkspaceResourceTest 11/11 — 17/17 pass
 - 2026-11-18T00:44:16Z gate G4 met: npm run build: tsc -b + vite build clean, 40 modules
+- 2026-11-18T00:46:37Z feature validated and shipped

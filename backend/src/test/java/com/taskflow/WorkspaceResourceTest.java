@@ -325,5 +325,111 @@ public class WorkspaceResourceTest {
                 .then().statusCode(200)
                 .body("find { it.userId == " + memberId + " }.displayName", equalTo("Monica Changed"));
     }
+
+    @Test
+    public void admin_role_boundaries() {
+        Response ownerLogin = registerVerifyLogin("rb-owner@example.com", "Rae", "Owner");
+        String ownerAuth = bearer(ownerLogin);
+        long ownerId = ownerLogin.jsonPath().getLong("user.id");
+        long wsId = ((Number) given().header("Authorization", ownerAuth).contentType(ContentType.JSON)
+                .body("{\"name\":\"RBAC\"}")
+                .when().post("/workspaces").then().statusCode(201)
+                .extract().path("id")).longValue();
+
+        // Owner promotes two members to admin.
+        Response admin1Login = registerVerifyLogin("rb-admin1@example.com", "Ada", "One");
+        Response admin2Login = registerVerifyLogin("rb-admin2@example.com", "Abe", "Two");
+        for (Response login : new Response[]{admin1Login, admin2Login}) {
+            String email = login.jsonPath().getString("user.email");
+            String token = given().header("Authorization", ownerAuth).contentType(ContentType.JSON)
+                    .body("{\"email\":\"" + email + "\",\"role\":\"admin\"}")
+                    .when().post("/workspaces/" + wsId + "/invites")
+                    .then().statusCode(201)
+                    .extract().path("token");
+            given().header("Authorization", bearer(login)).contentType(ContentType.JSON)
+                    .body("{\"token\":\"" + token + "\"}")
+                    .when().post("/workspaces/invites/accept")
+                    .then().statusCode(200)
+                    .body("role", equalTo("admin"));
+        }
+        String admin1Auth = bearer(admin1Login);
+        long admin2Id = admin2Login.jsonPath().getLong("user.id");
+
+        // Admins can manage members but cannot delete the workspace.
+        given().header("Authorization", admin1Auth)
+                .when().delete("/workspaces/" + wsId)
+                .then().statusCode(403);
+
+        // Admins cannot remove the owner or peer admins.
+        given().header("Authorization", admin1Auth)
+                .when().delete("/workspaces/" + wsId + "/members/" + ownerId)
+                .then().statusCode(409);
+        given().header("Authorization", admin1Auth)
+                .when().delete("/workspaces/" + wsId + "/members/" + admin2Id)
+                .then().statusCode(403);
+
+        // Only the owner may grant the admin role.
+        given().header("Authorization", admin1Auth).contentType(ContentType.JSON)
+                .body("{\"email\":\"rb-new@example.com\",\"role\":\"admin\"}")
+                .when().post("/workspaces/" + wsId + "/invites")
+                .then().statusCode(403);
+        given().header("Authorization", admin1Auth).contentType(ContentType.JSON)
+                .body("{\"email\":\"rb-new@example.com\",\"role\":\"member\"}")
+                .when().post("/workspaces/" + wsId + "/invites")
+                .then().statusCode(201);
+
+        // The owner can still remove an admin.
+        given().header("Authorization", ownerAuth)
+                .when().delete("/workspaces/" + wsId + "/members/" + admin2Id)
+                .then().statusCode(204);
+    }
+
+    @Test
+    public void member_cannot_list_pending_invites() {
+        Response ownerLogin = registerVerifyLogin("pi-owner@example.com", "Pia", "Owner");
+        String ownerAuth = bearer(ownerLogin);
+        long wsId = ((Number) given().header("Authorization", ownerAuth).contentType(ContentType.JSON)
+                .body("{\"name\":\"PendingInvites\"}")
+                .when().post("/workspaces").then().statusCode(201)
+                .extract().path("id")).longValue();
+
+        Response memberLogin = registerVerifyLogin("pi-member@example.com", "Pat", "Member");
+        String memberAuth = bearer(memberLogin);
+        String inviteToken = given().header("Authorization", ownerAuth).contentType(ContentType.JSON)
+                .body("{\"email\":\"pi-member@example.com\",\"role\":\"member\"}")
+                .when().post("/workspaces/" + wsId + "/invites")
+                .then().statusCode(201)
+                .extract().path("token");
+        given().header("Authorization", memberAuth).contentType(ContentType.JSON)
+                .body("{\"token\":\"" + inviteToken + "\"}")
+                .when().post("/workspaces/invites/accept")
+                .then().statusCode(200);
+
+        // Members see the roster but not pending invite tokens.
+        given().header("Authorization", memberAuth)
+                .when().get("/workspaces/" + wsId + "/members")
+                .then().statusCode(200);
+        given().header("Authorization", memberAuth)
+                .when().get("/workspaces/" + wsId + "/invites")
+                .then().statusCode(403);
+    }
+
+    // Scenario: Switch between workspaces
+    @Test
+    public void switch_between_workspaces() {
+        Response login = registerVerifyLogin("switch@example.com", "Sam", "Switch");
+        String auth = bearer(login);
+
+        for (String wsName : new String[]{"Alpha", "Beta"}) {
+            given().header("Authorization", auth).contentType(ContentType.JSON)
+                    .body("{\"name\":\"" + wsName + "\"}")
+                    .when().post("/workspaces").then().statusCode(201);
+        }
+
+        given().header("Authorization", auth)
+                .when().get("/workspaces")
+                .then().statusCode(200)
+                .body("$", hasSize(2));
+    }
 }
 

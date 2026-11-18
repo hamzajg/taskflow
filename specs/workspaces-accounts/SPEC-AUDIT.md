@@ -34,12 +34,20 @@ None.
 ## Verdict (agent fills after verifying the code)
 
 ```
-AUDIT: PASS | CONCERNS | BLOCK
-PHASE: spec | delivery
-BLOCKERS: <confirmed count and why>
-CONCERNS: <accepted concerns and why>
-UNVERIFIED: <what could not be checked>
-EVIDENCE: <commands run, files read, tests observed>
+AUDIT: PASS
+PHASE: spec
+BLOCKERS: 0 — all 12 acceptance criteria map to @w-tagged scenarios in
+  EXAMPLES.feature and backlog items US1–US6 in BACKLOG.md; verified by
+  reading SPEC.md, EXAMPLES.feature, BACKLOG.md, WAVES.md, GATES.md.
+CONCERNS: 0 — the earlier [missing-path] LOOP.md finding was stale
+  (LOOP.md exists and is oracle-written); no unresolved spec gaps.
+  D6 records the token_version revocation decision, implemented in
+  V2__token_version.sql.
+UNVERIFIED: 0 — spec completeness checked directly; demo script in
+  VALIDATION.md is a manual walkthrough, not a spec defect.
+EVIDENCE: read SPEC.md/EXAMPLES.feature/BACKLOG.md/WAVES.md/GATES.md/
+  DECISION-REVIEW.md; review_delivery --phase=spec brief (0 blockers);
+  ship_validate traceability — 12/12 scenarios have test evidence.
 ```
 
 Rules: `BLOCK` on any confirmed blocker, hallucinated claim, or

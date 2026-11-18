@@ -30,6 +30,7 @@ export default function WorkspacePanel({
   const [invites, setInvites] = useState<Invite[]>([])
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState('member')
+  const [renameTo, setRenameTo] = useState('')
 
   const refreshDetail = useCallback(async (id: number) => {
     const [m, i] = await Promise.all([
@@ -68,6 +69,30 @@ export default function WorkspacePanel({
     }
   }
 
+  async function rename(e: FormEvent) {
+    e.preventDefault()
+    if (openId === null) return
+    try {
+      await api.put(`/workspaces/${openId}`, { name: renameTo })
+      setRenameTo('')
+      onChanged()
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Rename failed')
+    }
+  }
+
+  async function destroy() {
+    if (openId === null) return
+    if (!window.confirm(`Delete workspace "${openWs?.name}"? This cannot be undone.`)) return
+    try {
+      await api.delete(`/workspaces/${openId}`)
+      setOpenId(null)
+      onChanged()
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Delete failed')
+    }
+  }
+
   async function removeMember(userId: number) {
     if (openId === null) return
     await api.delete(`/workspaces/${openId}/members/${userId}`).catch((err) =>
@@ -79,6 +104,7 @@ export default function WorkspacePanel({
 
   const openWs = workspaces.find((w) => w.id === openId)
   const canManage = openWs && ['owner', 'admin'].includes(openWs.role)
+  const isOwner = openWs?.role === 'owner' 
 
   return (
     <section>
@@ -110,6 +136,22 @@ export default function WorkspacePanel({
       {openWs && (
         <div className="panel">
           <h3>{openWs.name} — members</h3>
+          {canManage && (
+            <form className="inline-form" onSubmit={rename}>
+              <input
+                placeholder="Rename workspace"
+                value={renameTo}
+                onChange={(e) => setRenameTo(e.target.value)}
+                required
+              />
+              <button type="submit">Rename</button>
+            </form>
+          )}
+          {isOwner && (
+            <button className="link" onClick={destroy}>
+              delete workspace
+            </button>
+          )}
           <ul>
             {members.map((m) => (
               <li key={m.userId}>

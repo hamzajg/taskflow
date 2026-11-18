@@ -52,7 +52,7 @@ public class AuthResource {
     @Path("/resend-verification")
     @Authenticated
     public Response resendVerification() {
-        authService.resendVerification(currentUserId());
+        authService.resendVerification(currentUserId(), currentTokenVersion());
         return Response.ok(new Message("Verification email sent")).build();
     }
 
@@ -74,21 +74,21 @@ public class AuthResource {
     @Path("/me")
     @Authenticated
     public UserDto me() {
-        return UserDto.of(authService.requireUser(currentUserId()));
+        return UserDto.of(authService.requireUser(currentUserId(), currentTokenVersion()));
     }
 
     @PUT
     @Path("/profile")
     @Authenticated
     public UserDto updateProfile(@Valid ProfileUpdateRequest req) {
-        return authService.updateProfile(currentUserId(), req.firstName(), req.lastName());
+        return authService.updateProfile(currentUserId(), currentTokenVersion(), req.firstName(), req.lastName());
     }
 
     @POST
     @Path("/logout")
     @Authenticated
     public Response logout() {
-        // Stateless JWT: the client discards the token. Endpoint exists for symmetry.
+        authService.logout(currentUserId());
         return Response.noContent().build();
     }
 
@@ -102,5 +102,10 @@ public class AuthResource {
             LOG.warn("Invalid token subject", e);
             throw new WebApplicationException("Invalid token", Response.Status.UNAUTHORIZED);
         }
+    }
+
+    private Long currentTokenVersion() {
+        Object tv = jwt.getClaim("tv");
+        return tv == null ? null : Long.valueOf(tv.toString());
     }
 }

@@ -43,5 +43,15 @@ create it once: `docker exec taskflow-db-1 psql -U taskflow -d taskflow -c "CREA
 
 - JWT (RS256) issued by `POST /auth/login`; keys are dev keys in
   `backend/src/main/resources/keys/` — replace for any real deployment.
+- Sessions carry a `token_version` claim; `POST /auth/logout` and
+  password reset increment it, revoking all previously issued tokens.
 - Emails (verification, invites, password reset) are sent via
   `quarkus-mailer`; without SMTP they are logged server-side.
+
+## Workspaces & roles
+
+- Roles per workspace: `owner`, `admin`, `member` — enforced server-side
+  on every workspace endpoint (`WorkspaceService.requireMembership` /
+  `requireRole`).
+- Only the owner can delete a workspace, remove an admin, or grant the
+  admin role; admins manage members and can rename the workspace.

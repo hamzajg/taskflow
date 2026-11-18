@@ -101,6 +101,7 @@ public class AuthResourceTest {
                 .when().post("/auth/register").then().statusCode(409);
     }
 
+    // Scenario: Log in with valid credentials
     @Test
     public void me_requires_token_and_returns_user() {
         given().contentType(ContentType.JSON).body(registerPayload("me@example.com"))

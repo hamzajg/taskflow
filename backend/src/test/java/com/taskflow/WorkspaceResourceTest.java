@@ -413,5 +413,23 @@ public class WorkspaceResourceTest {
                 .when().get("/workspaces/" + wsId + "/invites")
                 .then().statusCode(403);
     }
+
+    // Scenario: Switch between workspaces
+    @Test
+    public void switch_between_workspaces() {
+        Response login = registerVerifyLogin("switch@example.com", "Sam", "Switch");
+        String auth = bearer(login);
+
+        for (String wsName : new String[]{"Alpha", "Beta"}) {
+            given().header("Authorization", auth).contentType(ContentType.JSON)
+                    .body("{\"name\":\"" + wsName + "\"}")
+                    .when().post("/workspaces").then().statusCode(201);
+        }
+
+        given().header("Authorization", auth)
+                .when().get("/workspaces")
+                .then().statusCode(200)
+                .body("$", hasSize(2));
+    }
 }
 

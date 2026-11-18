@@ -6,6 +6,7 @@ import Button from '../components/Button'
 import Card from '../components/Card'
 import Input from '../components/Input'
 import Select from '../components/Select'
+import { useShell } from '../shell/ShellContext'
 import { WorkspaceDto } from './workspaceTypes'
 
 interface Member {
@@ -43,6 +44,7 @@ export default function WorkspacePanel({
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState('member')
   const [renameTo, setRenameTo] = useState('')
+  const { activeWorkspaceId, setActiveWorkspaceId } = useShell()
 
   const refreshDetail = useCallback(async (id: number) => {
     const [m, i] = await Promise.all([
@@ -56,6 +58,13 @@ export default function WorkspacePanel({
   useEffect(() => {
     if (openId !== null) refreshDetail(openId).catch(() => {})
   }, [openId, refreshDetail])
+
+  // Sidebar workspace switcher drives which detail panel is open.
+  useEffect(() => {
+    if (activeWorkspaceId !== null && workspaces.some((w) => w.id === activeWorkspaceId)) {
+      setOpenId(activeWorkspaceId)
+    }
+  }, [activeWorkspaceId, workspaces])
 
   async function create(e: FormEvent) {
     e.preventDefault()
@@ -135,7 +144,11 @@ export default function WorkspacePanel({
       <ul className="ws-list">
         {workspaces.map((w) => (
           <li key={w.id}>
-            <Button variant="link" onClick={() => setOpenId(openId === w.id ? null : w.id)}>
+            <Button variant="link" onClick={() => {
+                const next = openId === w.id ? null : w.id
+                setOpenId(next)
+                setActiveWorkspaceId(next)
+              }}>
               {w.name}
             </Button>
             <Badge tone={ROLE_TONES[w.role] ?? 'neutral'}>{w.role}</Badge>

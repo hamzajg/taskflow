@@ -126,10 +126,6 @@ public class WorkspaceService {
     public void removeMember(User user, Long workspaceId, Long targetUserId) {
         Membership mb = requireMembership(workspaceId, user.id);
         requireRole(mb, WorkspaceMember.ROLE_OWNER, WorkspaceMember.ROLE_ADMIN);
-        if (mb.member().role.equals(WorkspaceMember.ROLE_MEMBER)
-                && !mb.member().userId.equals(targetUserId)) {
-            throw new WebApplicationException("Insufficient role", Response.Status.FORBIDDEN);
-        }
         WorkspaceMember target = WorkspaceMember.find("workspaceId = ?1 and userId = ?2",
                 workspaceId, targetUserId).firstResult();
         if (target == null) {
@@ -146,6 +142,10 @@ public class WorkspaceService {
         Membership mb = requireMembership(workspaceId, user.id);
         requireRole(mb, WorkspaceMember.ROLE_OWNER, WorkspaceMember.ROLE_ADMIN);
         String normalized = email.toLowerCase();
+        String inviteRole = sanitizeRole(role);
+        if (inviteRole == null) {
+            throw new WebApplicationException("Invalid role", Response.Status.BAD_REQUEST);
+        }
         User invitee = User.find("lower(email) = ?1", normalized).firstResult();
         boolean alreadyMember = invitee != null && WorkspaceMember.count(
                 "workspaceId = ?1 and userId = ?2", workspaceId, invitee.id) > 0;
@@ -155,7 +155,7 @@ public class WorkspaceService {
         WorkspaceInvite invite = new WorkspaceInvite();
         invite.workspaceId = workspaceId;
         invite.email = normalized;
-        invite.role = role == null ? WorkspaceMember.ROLE_MEMBER : role;
+        invite.role = inviteRole;
         invite.token = newToken();
         invite.invitedBy = user.id;
         invite.expiresAt = Instant.now().plus(7, ChronoUnit.DAYS);
@@ -209,7 +209,8 @@ public class WorkspaceService {
             m = new WorkspaceMember();
             m.workspaceId = invite.workspaceId;
             m.userId = user.id;
-            m.role = invite.role;
+            String acceptedRole = sanitizeRole(invite.role);
+            m.role = acceptedRole == null ? WorkspaceMember.ROLE_MEMBER : acceptedRole;
             m.persist();
         }
         Workspace ws = Workspace.findById(invite.workspaceId);
@@ -219,6 +220,18 @@ public class WorkspaceService {
     private WorkspaceDto toDto(Workspace ws, String role) {
         long count = WorkspaceMember.count("workspaceId", ws.id);
         return new WorkspaceDto(ws.id, ws.name, role, count);
+    }
+
+    /** Returns the canonical role, or null when the value is not assignable via invite. */
+    private static String sanitizeRole(String role) {
+        if (role == null || role.isBlank()) {
+            return WorkspaceMember.ROLE_MEMBER;
+        }
+        String normalized = role.trim().toLowerCase();
+        return switch (normalized) {
+            case WorkspaceMember.ROLE_MEMBER, WorkspaceMember.ROLE_ADMIN -> normalized;
+            default -> null;
+        };
     }
 
     private static String newToken() {

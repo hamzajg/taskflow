@@ -2,14 +2,14 @@
 
 Status: running
 Iterations: 2
-Updated: 2026-11-18T00:41:31Z
+Updated: 2026-11-18T00:43:20Z
 
 | Wave | Status | Branch | PR | Evidence | Updated |
 |------|--------|--------|----|----------|---------|
 | 1 | done | feat/workspaces-accounts-w1 | #1 | backend mvn test 6/6, frontend npm run build OK | 2026-11-17T23:59:51Z |
 | 2 | done | feat/workspaces-accounts-w2 | #2 | backend 10/10 tests, frontend build clean | 2026-11-18T00:02:58Z |
 | 3 | done | feat/workspaces-accounts-w3 | #3 | backend 15/15 tests (6 auth + 9 workspace), frontend build clean; role whitelist + isolation/escalation scenario tests + | 2026-11-18T00:41:27Z |
-| 4 | pending | — | — | — | — |
+| 4 | in-progress | feat/workspaces-accounts-w4 | — | — | 2026-11-18T00:43:20Z |
 
 ## Gates
 
@@ -32,3 +32,4 @@ Updated: 2026-11-18T00:41:31Z
 - 2026-11-18T00:24:13Z gate G5 met: file:specs/workspaces-accounts/DECISION-REVIEW.md — verdict REVISE, outcome recorded as D6
 - 2026-11-18T00:25:58Z start wave 3 on feat/workspaces-accounts-w3
 - 2026-11-18T00:41:27Z complete wave 3 (#3): backend 15/15 tests (6 auth + 9 workspace), frontend build clean; role whitelist + isolation/escalation scenario tests +
+- 2026-11-18T00:43:20Z start wave 4 on feat/workspaces-accounts-w4

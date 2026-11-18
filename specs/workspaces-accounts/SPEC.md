@@ -82,3 +82,18 @@ can exist.
   all queries are filtered by it server-side.
 - **D5 — Naming:** product is "TaskFlow"; no references to any prior
   system anywhere in this repo.
+- **D6 — Design review outcome:** `DECISION-REVIEW.md` verdict **REVISE**
+  (challenger, evidence-scored). Direction accepted: boring standard
+  stack, `workspace_members` as the single tenancy choke point (verified:
+  every workspace endpoint funnels through `requireMembership`/
+  `requireRole` with server-side `workspace_id` filtering + 403 test).
+  Recorded tradeoffs: stateless JWT means logout does NOT invalidate
+  already-issued tokens (≤1h window) — accepted for v1 under the
+  re-login interpretation of AC4; `token_version` revocation (challenger
+  option A2) deferred. Revisit D3 on any stolen/expired-session incident,
+  a compliance requirement for immediate revocation, or if AC4 is audited
+  as requiring server-side invalidation; revisit D4 (→ RLS/schema-per-
+  tenant) only if a second service or tenant growth makes app-level
+  filtering the bottleneck. Follow-ups noted by the review: member-role
+  denial tests (folds into US5/wave 4), invite email-mismatch negative
+  test, invite token not leaked to non-invitees.

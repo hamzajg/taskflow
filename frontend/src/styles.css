@@ -497,7 +497,7 @@ button:focus-visible {
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(15, 20, 32, 0.45);
+    background: var(--color-overlay);
     z-index: 30;
   }
 

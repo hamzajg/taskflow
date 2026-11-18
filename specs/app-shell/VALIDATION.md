@@ -4,25 +4,25 @@
 
 | AC | Criterion | Scenarios | Wave(s) | Test evidence |
 |----|-----------|-----------|---------|---------------|
-| 1 | All tokens defined once as CSS custom properties; no… | Design tokens are the single source of styling, Shared primitives replace duplicated markup | 1 | — |
-| 2 | Shared primitives (Button/Input/Card/Badge) used by all… | Design tokens are the single source of styling, Shared primitives replace duplicated markup | 1 | — |
-| 3 | Authenticated routes render inside sidebar+topbar shell… | Authenticated pages render inside the app shell, Sidebar collapses on narrow viewports | 2 | — |
-| 4 | Theme toggle switches light/dark instantly and persists… | First visit honors OS preference, Theme toggle switches and persists | 3 | — |
-| 5 | First visit honors OS `prefers-color-scheme` | First visit honors OS preference, Theme toggle switches and persists | 3 | — |
-| 6 | Existing functionality unchanged: login, register, verify… | Existing flows still work inside the shell, Keyboard and assistive technology support | 4 | — |
-| 7 | Keyboard focus visible and icon-only controls have… | Existing flows still work inside the shell, Keyboard and assistive technology support | 4 | — |
+| 1 | All tokens defined once as CSS custom properties; no… | Design tokens are the single source of styling, Shared primitives replace duplicated markup | 1 | tokens.test.ts |
+| 2 | Shared primitives (Button/Input/Card/Badge) used by all… | Design tokens are the single source of styling, Shared primitives replace duplicated markup | 1 | tokens.test.ts |
+| 3 | Authenticated routes render inside sidebar+topbar shell… | Authenticated pages render inside the app shell, Sidebar collapses on narrow viewports | 2 | shell.test.tsx |
+| 4 | Theme toggle switches light/dark instantly and persists… | First visit honors OS preference, Theme toggle switches and persists | 3 | theme.test.ts |
+| 5 | First visit honors OS `prefers-color-scheme` | First visit honors OS preference, Theme toggle switches and persists | 3 | theme.test.ts |
+| 6 | Existing functionality unchanged: login, register, verify… | Existing flows still work inside the shell, Keyboard and assistive technology support | 4 | shell.test.tsx |
+| 7 | Keyboard focus visible and icon-only controls have… | Existing flows still work inside the shell, Keyboard and assistive technology support | 4 | shell.test.tsx |
 
 ## Scenario coverage
 
-- Scenarios: 8 total, 0 with detected test evidence, 8 without
-- ✗ `Design tokens are the single source of styling` (@w1)
-- ✗ `Shared primitives replace duplicated markup` (@w1)
-- ✗ `Authenticated pages render inside the app shell` (@w2)
+- Scenarios: 8 total, 7 with detected test evidence, 1 without
+- ✓ `Design tokens are the single source of styling` (@w1)
+- ✓ `Shared primitives replace duplicated markup` (@w1)
+- ✓ `Authenticated pages render inside the app shell` (@w2)
 - ✗ `Sidebar collapses on narrow viewports` (@w2)
-- ✗ `Theme toggle switches and persists` (@w3)
-- ✗ `First visit honors OS preference` (@w3)
-- ✗ `Existing flows still work inside the shell` (@w4)
-- ✗ `Keyboard and assistive technology support` (@w4)
+- ✓ `Theme toggle switches and persists` (@w3)
+- ✓ `First visit honors OS preference` (@w3)
+- ✓ `Existing flows still work inside the shell` (@w4)
+- ✓ `Keyboard and assistive technology support` (@w4)
 
 ## Demo script (manual walkthrough)
 
@@ -33,7 +33,7 @@
 
 ## Gaps
 
-- 8 scenario(s) lack detected test evidence — verify manually or add checks
+- 1 scenario(s) lack detected test evidence — verify manually or add checks
 
 Note: 'no evidence' means neither the scenario name nor a
 token match was found in test files — verify by hand before

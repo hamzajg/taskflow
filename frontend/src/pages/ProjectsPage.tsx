@@ -110,7 +110,11 @@ export default function ProjectsPage() {
             <Button type="submit">Create project</Button>
           </form>
 
-          {loading && <p className="muted">Loading…</p>}
+          {loading && (
+            <p className="muted" role="status">
+              Loading…
+            </p>
+          )}
           {!loading && projects && projects.length === 0 && (
             <p className="muted">No projects yet — create the first one above.</p>
           )}

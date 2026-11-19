@@ -59,6 +59,7 @@ export default function ProjectDetailPage() {
 
   const [form, setForm] = useState<TaskForm>(EMPTY_FORM)
   const [formError, setFormError] = useState('')
+  const [actionError, setActionError] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editForm, setEditForm] = useState<TaskForm>(EMPTY_FORM)
   const [view, setView] = useState<'list' | 'board'>(() =>
@@ -73,11 +74,12 @@ export default function ProjectDetailPage() {
   }
 
   async function moveTask(taskId: number, status: string, position: number) {
+    setActionError('')
     try {
       await api.patch(`/tasks/${taskId}/move`, { status, position })
       await load()
     } catch (err) {
-      setFormError(err instanceof ApiError ? err.message : 'Move failed')
+      setActionError(err instanceof ApiError ? err.message : 'Move failed')
     }
   }
 
@@ -142,7 +144,7 @@ export default function ProjectDetailPage() {
   async function saveEdit(e: FormEvent) {
     e.preventDefault()
     if (editingId === null) return
-    setFormError('')
+    setActionError('')
     try {
       const body: Record<string, unknown> = {
         title: editForm.title,
@@ -160,21 +162,26 @@ export default function ProjectDetailPage() {
       setEditingId(null)
       await load()
     } catch (err) {
-      setFormError(err instanceof ApiError ? err.message : 'Update failed')
+      setActionError(err instanceof ApiError ? err.message : 'Update failed')
     }
   }
 
   async function removeTask(taskId: number) {
+    setActionError('')
     try {
       await api.delete(`/tasks/${taskId}`)
       await load()
     } catch (err) {
-      setFormError(err instanceof ApiError ? err.message : 'Delete failed')
+      setActionError(err instanceof ApiError ? err.message : 'Delete failed')
     }
   }
 
   if (loading) {
-    return <p className="muted">Loading…</p>
+    return (
+      <p className="muted" role="status">
+        Loading…
+      </p>
+    )
   }
   if (error || !project) {
     return (
@@ -274,8 +281,11 @@ export default function ProjectDetailPage() {
           </div>
         }
       >
+        {actionError && <Alert>{actionError}</Alert>}
         {tasks === null ? (
-          <p className="muted">Loading…</p>
+          <p className="muted" role="status">
+            Loading…
+          </p>
         ) : tasks.length === 0 ? (
           <p className="muted">No tasks yet — create the first one above.</p>
         ) : view === 'board' ? (

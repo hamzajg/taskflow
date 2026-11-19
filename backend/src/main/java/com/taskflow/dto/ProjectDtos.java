@@ -14,13 +14,15 @@ public final class ProjectDtos {
 
     public record ProjectDto(
             Long id,
+            Long workspaceId,
             String name,
             String description,
             String color,
             long taskCount,
             Instant createdAt) {
         public static ProjectDto of(Project p, long taskCount) {
-            return new ProjectDto(p.id, p.name, p.description, p.color, taskCount, p.createdAt);
+            return new ProjectDto(p.id, p.workspaceId, p.name, p.description, p.color,
+                    taskCount, p.createdAt);
         }
     }
 

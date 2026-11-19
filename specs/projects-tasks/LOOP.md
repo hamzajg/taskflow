@@ -1,13 +1,13 @@
 # Delivery Loop — projects-tasks
 
 Status: running
-Iterations: 1
-Updated: 2026-11-18T07:50:17Z
+Iterations: 3
+Updated: 2026-11-19T17:40:01Z
 
 | Wave | Status | Branch | PR | Evidence | Updated |
 |------|--------|--------|----|----------|---------|
 | 1 | done | feat/projects-tasks-w1 | #13 | mvn test 26/26, frontend build+vitest clean, OpenAPI live, curl walkthrough evidence verified; PR #13 merged | 2026-11-18T07:50:17Z |
-| 2 | pending | — | — | — | — |
+| 2 | in-progress | feat/projects-tasks-w2 | — | — | 2026-11-19T17:40:01Z |
 | 3 | pending | — | — | — | — |
 | 4 | pending | — | — | — | — |
 
@@ -22,3 +22,4 @@ Updated: 2026-11-18T07:50:17Z
 - 2026-11-18T06:24:04Z gate G1 met: specs/projects-tasks/DECISION-REVIEW.md
 - 2026-11-18T06:24:11Z start wave 1 on feat/projects-tasks-w1
 - 2026-11-18T07:50:17Z complete wave 1 (#13): mvn test 26/26, frontend build+vitest clean, OpenAPI live, curl walkthrough evidence verified; PR #13 merged
+- 2026-11-19T17:40:01Z start wave 2 on feat/projects-tasks-w2

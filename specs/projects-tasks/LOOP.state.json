@@ -1,8 +1,8 @@
 {
   "feature": "projects-tasks",
   "status": "running",
-  "iterations": 1,
-  "updated": "2026-11-18T07:50:17Z",
+  "iterations": 3,
+  "updated": "2026-11-19T17:40:01Z",
   "waves": {
     "1": {
       "status": "done",
@@ -10,6 +10,13 @@
       "pr": "#13",
       "evidence": "mvn test 26/26, frontend build+vitest clean, OpenAPI live, curl walkthrough evidence verified; PR #13 merged",
       "updated": "2026-11-18T07:50:17Z"
+    },
+    "2": {
+      "status": "in-progress",
+      "branch": "feat/projects-tasks-w2",
+      "pr": "\u2014",
+      "evidence": "\u2014",
+      "updated": "2026-11-19T17:40:01Z"
     }
   },
   "gates": {
@@ -22,6 +29,7 @@
   "events": [
     "2026-11-18T06:24:04Z gate G1 met: specs/projects-tasks/DECISION-REVIEW.md",
     "2026-11-18T06:24:11Z start wave 1 on feat/projects-tasks-w1",
-    "2026-11-18T07:50:17Z complete wave 1 (#13): mvn test 26/26, frontend build+vitest clean, OpenAPI live, curl walkthrough evidence verified; PR #13 merged"
+    "2026-11-18T07:50:17Z complete wave 1 (#13): mvn test 26/26, frontend build+vitest clean, OpenAPI live, curl walkthrough evidence verified; PR #13 merged",
+    "2026-11-19T17:40:01Z start wave 2 on feat/projects-tasks-w2"
   ]
 }

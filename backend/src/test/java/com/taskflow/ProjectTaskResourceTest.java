@@ -357,4 +357,31 @@ public class ProjectTaskResourceTest {
                 .when().patch("/tasks/" + b + "/move")
                 .then().statusCode(400);
     }
+
+    // Item-level project lookup used by the project detail screen
+    @Test
+    public void get_project_by_id_resolves_tenancy() {
+        Response owner = registerVerifyLogin("gi@example.com", "Get", "Item");
+        String ownerAuth = bearer(owner);
+        long wsId = createWorkspace(ownerAuth, "Item WS");
+        long projectId = createProject(ownerAuth, wsId, "Item Proj");
+        createTask(ownerAuth, projectId, "{\"title\":\"t1\"}");
+
+        given().header("Authorization", ownerAuth)
+                .when().get("/projects/" + projectId)
+                .then().statusCode(200)
+                .body("id", equalTo((int) projectId))
+                .body("workspaceId", equalTo((int) wsId))
+                .body("name", equalTo("Item Proj"))
+                .body("taskCount", equalTo(1));
+
+        Response stranger = registerVerifyLogin("gs@example.com", "Get", "Stranger");
+        given().header("Authorization", bearer(stranger))
+                .when().get("/projects/" + projectId)
+                .then().statusCode(403);
+
+        given().header("Authorization", ownerAuth)
+                .when().get("/projects/999999")
+                .then().statusCode(404);
+    }
 }

@@ -1,6 +1,6 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
-import { FolderKanban, LayoutDashboard, LogOut, Menu, Moon, Sun, User as UserIcon, X } from 'lucide-react'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { FolderKanban, LayoutDashboard, ListTodo, LogOut, Menu, Moon, Sun, User as UserIcon, X } from 'lucide-react'
 import { api } from '../api'
 import { clearSession, getUser, saveUser, User } from '../auth'
 import Button from './Button'
@@ -17,11 +17,12 @@ interface NavEntry {
 
 const NAV: NavEntry[] = [
   { label: 'Dashboard', icon: <LayoutDashboard size={18} />, to: '/' },
+  { label: 'Projects', icon: <ListTodo size={18} />, to: '/projects' },
   { label: 'Workspaces', icon: <FolderKanban size={18} />, hash: '#workspaces' },
   { label: 'Profile', icon: <UserIcon size={18} />, hash: '#profile' },
 ]
 
-export default function AppShell({ children }: { children: ReactNode }) {
+export default function AppShell() {
   const [user, setUser] = useState<User | null>(getUser())
   const [workspaces, setWorkspaces] = useState<WorkspaceDto[]>([])
   const [activeWorkspaceId, setActiveWorkspaceId] = useState<number | null>(null)
@@ -92,15 +93,15 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 <span>{item.label}</span>
               </NavLink>
             ) : (
-              <a
+              <Link
                 key={item.label}
-                href={item.hash}
+                to={{ pathname: '/', hash: item.hash }}
                 className="nav-link"
                 onClick={() => setNavOpen(false)}
               >
                 {item.icon}
                 <span>{item.label}</span>
-              </a>
+              </Link>
             ),
           )}
         </nav>
@@ -182,7 +183,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
           {user && <span className="muted topbar-user">{`${user.firstName} ${user.lastName}`}</span>}
         </header>
         <main className="content" id="main">
-          <ShellProvider value={shell}>{children}</ShellProvider>
+          <ShellProvider value={shell}>
+            <Outlet />
+          </ShellProvider>
         </main>
       </div>
     </div>

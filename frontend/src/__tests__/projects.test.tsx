@@ -1,0 +1,220 @@
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import App from '../App'
+import { setSession, User } from '../auth'
+
+const USER: User = {
+  id: 1,
+  firstName: 'Demo',
+  lastName: 'User',
+  email: 'demo@taskflow.local',
+  verified: true,
+}
+
+const WORKSPACE = { id: 1, name: 'Acme', role: 'owner', memberCount: 2 }
+
+const PROJECTS = [
+  {
+    id: 5,
+    workspaceId: 1,
+    name: 'Website redesign',
+    description: 'New marketing site',
+    color: null,
+    taskCount: 2,
+    createdAt: '2026-11-18T00:00:00Z',
+  },
+  {
+    id: 6,
+    workspaceId: 1,
+    name: 'Mobile app',
+    description: null,
+    color: null,
+    taskCount: 0,
+    createdAt: '2026-11-18T00:00:00Z',
+  },
+]
+
+const PROJECT_5 = PROJECTS[0]
+
+const TASKS = [
+  {
+    id: 11,
+    projectId: 5,
+    title: 'Write copy',
+    description: null,
+    status: 'todo',
+    priority: 'high',
+    assigneeId: 1,
+    assigneeName: 'Demo User',
+    dueDate: '2026-12-01',
+    position: 0,
+    createdAt: '2026-11-18T00:00:00Z',
+  },
+  {
+    id: 12,
+    projectId: 5,
+    title: 'Ship landing page',
+    description: null,
+    status: 'done',
+    priority: 'medium',
+    assigneeId: null,
+    assigneeName: null,
+    dueDate: null,
+    position: 0,
+    createdAt: '2026-11-18T00:00:00Z',
+  },
+]
+
+const MEMBERS = [
+  { userId: 1, displayName: 'Demo User', email: 'demo@taskflow.local', role: 'owner' },
+  { userId: 2, displayName: 'Mem Ber', email: 'mem@taskflow.local', role: 'member' },
+]
+
+function jsonResponse(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+function mockApi(overrides: Record<string, unknown> = {}) {
+  const routes: Record<string, unknown> = {
+    '/auth/me': USER,
+    '/workspaces': [WORKSPACE],
+    '/workspaces/1/projects': PROJECTS,
+    '/projects/5': PROJECT_5,
+    '/projects/6': PROJECTS[1],
+    '/projects/5/tasks': TASKS,
+    '/projects/6/tasks': [],
+    '/workspaces/1/members': MEMBERS,
+    ...overrides,
+  }
+  vi.stubGlobal(
+    'fetch',
+    vi.fn((input: RequestInfo | URL) => {
+      const url = String(input)
+      if (url in routes) return Promise.resolve(jsonResponse(routes[url]))
+      return Promise.resolve(jsonResponse({ message: 'not found' }, 404))
+    }),
+  )
+}
+
+function renderAt(path: string) {
+  setSession({ token: 'test-token', user: USER })
+  return render(
+    <MemoryRouter initialEntries={[path]}>
+      <App />
+    </MemoryRouter>,
+  )
+}
+
+describe('Projects list — "Projects list shows workspace projects with counts"', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('lists workspace projects with task counts and links to detail', async () => {
+    renderAt('/projects')
+    expect(await screen.findByText('Website redesign')).toBeTruthy()
+    expect(screen.getByText('Mobile app')).toBeTruthy()
+    expect(screen.getByText(/2 tasks/)).toBeTruthy()
+    expect(screen.getByText(/0 tasks/)).toBeTruthy()
+    const link = screen.getByRole('link', { name: /Website redesign/ })
+    expect(link.getAttribute('href')).toBe('/projects/5')
+  })
+
+  it('exposes a Projects entry in the sidebar navigation', async () => {
+    renderAt('/')
+    await screen.findByText('Welcome, Demo')
+    const nav = screen.getAllByRole('link', { name: /Projects/ })
+    expect(nav.length).toBeGreaterThan(0)
+    expect(nav[0].getAttribute('href')).toBe('/projects')
+  })
+})
+
+describe('Project detail — "Project detail shows tasks in list view"', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('groups tasks by status and shows task fields', async () => {
+    renderAt('/projects/5')
+    expect(await screen.findByText('Website redesign')).toBeTruthy()
+    expect(await screen.findByText('Write copy')).toBeTruthy()
+    expect(screen.getByText('Ship landing page')).toBeTruthy()
+    // grouped under status headings
+    expect(screen.getByRole('heading', { name: /todo/i })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: /^done/i })).toBeTruthy()
+    // task fields visible (assignee also appears in topbar/select, so allow many)
+    expect(screen.getByText(/high/)).toBeTruthy()
+    expect(screen.getAllByText(/Demo User/).length).toBeGreaterThan(1)
+    expect(screen.getByText(/2026-12-01/)).toBeTruthy()
+  })
+
+  it('creates a task through the create form', async () => {
+    const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input)
+      const routes: Record<string, unknown> = {
+        '/auth/me': USER,
+        '/workspaces': [WORKSPACE],
+        '/projects/5': PROJECT_5,
+        '/projects/5/tasks': TASKS,
+        '/workspaces/1/members': MEMBERS,
+      }
+      if (url === '/projects/5/tasks' && init?.method === 'POST') {
+        return Promise.resolve(jsonResponse({ ...TASKS[0], id: 99, title: 'New task' }, 201))
+      }
+      if (url in routes) return Promise.resolve(jsonResponse(routes[url]))
+      return Promise.resolve(jsonResponse({ message: 'not found' }, 404))
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    setSession({ token: 'test-token', user: USER })
+    render(
+      <MemoryRouter initialEntries={['/projects/5']}>
+        <App />
+      </MemoryRouter>,
+    )
+    const titleInput = await screen.findByLabelText(/title/i)
+    fireEvent.change(titleInput, { target: { value: 'New task' } })
+    fireEvent.click(screen.getByRole('button', { name: /add task|create task/i }))
+    await waitFor(() =>
+      expect(
+        fetchMock.mock.calls.some(
+          ([u, i]) => String(u) === '/projects/5/tasks' && i?.method === 'POST',
+        ),
+      ).toBe(true),
+    )
+  })
+})
+
+describe('Project detail — "Empty project shows a useful empty state"', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('prompts to create the first task and shows no error', async () => {
+    renderAt('/projects/6')
+    expect(await screen.findByText('Mobile app')).toBeTruthy()
+    expect(await screen.findByText(/no tasks|first task|empty/i)).toBeTruthy()
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
+})

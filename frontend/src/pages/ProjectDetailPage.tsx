@@ -7,6 +7,7 @@ import Button from '../components/Button'
 import Card from '../components/Card'
 import Input from '../components/Input'
 import Select from '../components/Select'
+import BoardView from './BoardView'
 import {
   MemberDto,
   priorityTone,
@@ -60,6 +61,25 @@ export default function ProjectDetailPage() {
   const [formError, setFormError] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editForm, setEditForm] = useState<TaskForm>(EMPTY_FORM)
+  const [view, setView] = useState<'list' | 'board'>(() =>
+    localStorage.getItem(`taskflow.view.${projectId}`) === 'board'
+      ? 'board'
+      : 'list',
+  )
+
+  function switchView(next: 'list' | 'board') {
+    setView(next)
+    localStorage.setItem(`taskflow.view.${projectId}`, next)
+  }
+
+  async function moveTask(taskId: number, status: string, position: number) {
+    try {
+      await api.patch(`/tasks/${taskId}/move`, { status, position })
+      await load()
+    } catch (err) {
+      setFormError(err instanceof ApiError ? err.message : 'Move failed')
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -231,11 +251,35 @@ export default function ProjectDetailPage() {
         </form>
       </Card>
 
-      <Card title="Tasks">
+      <Card
+        title="Tasks"
+        actions={
+          <div className="view-toggle" role="group" aria-label="Task view">
+            <Button
+              variant={view === 'list' ? 'secondary' : 'link'}
+              size="sm"
+              aria-pressed={view === 'list'}
+              onClick={() => switchView('list')}
+            >
+              List
+            </Button>
+            <Button
+              variant={view === 'board' ? 'secondary' : 'link'}
+              size="sm"
+              aria-pressed={view === 'board'}
+              onClick={() => switchView('board')}
+            >
+              Board
+            </Button>
+          </div>
+        }
+      >
         {tasks === null ? (
           <p className="muted">Loading…</p>
         ) : tasks.length === 0 ? (
           <p className="muted">No tasks yet — create the first one above.</p>
+        ) : view === 'board' ? (
+          <BoardView tasks={tasks} onMove={moveTask} />
         ) : (
           grouped.map((g) => (
             <section key={g.status} className="task-group">

@@ -1,8 +1,8 @@
 # Delivery Loop — projects-tasks
 
-Status: running
+Status: done
 Iterations: 3
-Updated: 2026-11-19T19:10:49Z
+Updated: 2026-11-19T19:14:38Z
 
 | Wave | Status | Branch | PR | Evidence | Updated |
 |------|--------|--------|----|----------|---------|
@@ -28,3 +28,4 @@ Updated: 2026-11-19T19:10:49Z
 - 2026-11-19T18:51:37Z complete wave 3 (#16): vitest 21/21, build clean, mvn test 28/28 unchanged, Playwright walkthrough evidence 20261119T185042Z-7805ba4 (drag pers
 - 2026-11-19T18:52:04Z start wave 4 on feat/projects-tasks-w4
 - 2026-11-19T19:10:49Z complete wave 4 (#17): vitest 27/27, build clean, mvn test 28/28 unchanged, both-theme walkthrough evidence 20261119T190956Z-0baaf4b; stacked o
+- 2026-11-19T19:14:38Z feature validated and shipped

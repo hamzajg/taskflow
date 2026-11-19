@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from '../App'
@@ -216,5 +216,99 @@ describe('Project detail — "Empty project shows a useful empty state"', () => 
     expect(await screen.findByText('Mobile app')).toBeTruthy()
     expect(await screen.findByText(/no tasks|first task|empty/i)).toBeTruthy()
     expect(screen.queryByRole('alert')).toBeNull()
+  })
+})
+
+describe('Board view — "Board groups tasks by status column"', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('shows one column per status with its tasks', async () => {
+    renderAt('/projects/5')
+    await screen.findByText('Write copy')
+    fireEvent.click(screen.getByRole('button', { name: /^board$/i }))
+    // status columns
+    for (const label of ['Backlog', 'Todo', 'In progress', 'Done']) {
+      expect(screen.getByRole('heading', { name: new RegExp(label, 'i') })).toBeTruthy()
+    }
+    // tasks land in their status column
+    const todoCol = screen.getByRole('heading', { name: /^todo/i }).closest('section')!
+    expect(todoCol.textContent).toContain('Write copy')
+    const doneCol = screen.getByRole('heading', { name: /^done/i }).closest('section')!
+    expect(doneCol.textContent).toContain('Ship landing page')
+    expect(todoCol.textContent).not.toContain('Ship landing page')
+  })
+
+  it('persists the board preference per project', async () => {
+    renderAt('/projects/5')
+    await screen.findByText('Write copy')
+    fireEvent.click(screen.getByRole('button', { name: /^board$/i }))
+    expect(localStorage.getItem('taskflow.view.5')).toBe('board')
+  })
+})
+
+describe('Board view — "Moving a task on the board persists status and order"', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    localStorage.setItem('taskflow.view.5', 'board')
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('move control calls PATCH /tasks/{id}/move and reloads', async () => {
+    const moved = { ...TASKS[0], status: 'done', position: 1 }
+    const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input)
+      const routes: Record<string, unknown> = {
+        '/auth/me': USER,
+        '/workspaces': [WORKSPACE],
+        '/projects/5': PROJECT_5,
+        '/projects/5/tasks': TASKS,
+        '/workspaces/1/members': MEMBERS,
+      }
+      if (url === '/tasks/11/move' && init?.method === 'PATCH') {
+        return Promise.resolve(
+          jsonResponse({ task: moved, column: [TASKS[1], moved] }, 200),
+        )
+      }
+      if (url in routes) return Promise.resolve(jsonResponse(routes[url]))
+      return Promise.resolve(jsonResponse({ message: 'not found' }, 404))
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    setSession({ token: 'test-token', user: USER })
+    render(
+      <MemoryRouter initialEntries={['/projects/5']}>
+        <App />
+      </MemoryRouter>,
+    )
+    await screen.findByText('Write copy')
+    // open the move control on the todo task and move it to done
+    const card = screen.getByText('Write copy').closest('li')!
+    fireEvent.click(card.querySelector('button')!)
+    const statusSelect = await screen.findByLabelText(/move to status/i)
+    fireEvent.change(statusSelect, { target: { value: 'done' } })
+    const form = card.querySelector('form.move-form') as HTMLElement
+    fireEvent.click(within(form).getByRole('button', { name: /^move$/i }))
+    await waitFor(() =>
+      expect(
+        fetchMock.mock.calls.some(
+          ([u, i]) =>
+            String(u) === '/tasks/11/move' &&
+            i?.method === 'PATCH' &&
+            JSON.parse(String(i.body)).status === 'done',
+        ),
+      ).toBe(true),
+    )
   })
 })

@@ -312,3 +312,126 @@ describe('Board view — "Moving a task on the board persists status and order"'
     )
   })
 })
+
+describe('Polish — "Loading and error states are handled"', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('projects page shows an error alert with retry when the request fails', async () => {
+    mockApi({ '/workspaces/1/projects': { __status: 500, message: 'boom' } })
+    // mockApi stores bodies; emulate failure by wrapping fetch
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) => {
+        const url = String(input)
+        if (url === '/workspaces/1/projects')
+          return Promise.resolve(jsonResponse({ message: 'boom' }, 500))
+        const routes: Record<string, unknown> = {
+          '/auth/me': USER,
+          '/workspaces': [WORKSPACE],
+        }
+        if (url in routes) return Promise.resolve(jsonResponse(routes[url]))
+        return Promise.resolve(jsonResponse({ message: 'not found' }, 404))
+      }),
+    )
+    renderAt('/projects')
+    const alert = await screen.findByRole('alert')
+    expect(alert.textContent).toContain('boom')
+    expect(screen.getByRole('button', { name: /retry/i })).toBeTruthy()
+  })
+
+  it('project detail shows an error alert with retry when the project fails to load', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) => {
+        const url = String(input)
+        if (url === '/projects/5')
+          return Promise.resolve(jsonResponse({ message: 'nope' }, 500))
+        const routes: Record<string, unknown> = {
+          '/auth/me': USER,
+          '/workspaces': [WORKSPACE],
+        }
+        if (url in routes) return Promise.resolve(jsonResponse(routes[url]))
+        return Promise.resolve(jsonResponse({ message: 'not found' }, 404))
+      }),
+    )
+    renderAt('/projects/5')
+    const alert = await screen.findByRole('alert')
+    expect(alert.textContent).toContain('nope')
+    expect(screen.getByRole('button', { name: /retry/i })).toBeTruthy()
+  })
+
+  it('exposes a status region while data loads', async () => {
+    let resolveProjects: (v: Response) => void = () => {}
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) => {
+        const url = String(input)
+        if (url === '/workspaces/1/projects')
+          return new Promise<Response>((res) => {
+            resolveProjects = res
+          })
+        const routes: Record<string, unknown> = {
+          '/auth/me': USER,
+          '/workspaces': [WORKSPACE],
+        }
+        if (url in routes) return Promise.resolve(jsonResponse(routes[url]))
+        return Promise.resolve(jsonResponse({ message: 'not found' }, 404))
+      }),
+    )
+    renderAt('/projects')
+    const status = await screen.findByRole('status')
+    expect(status.textContent).toMatch(/loading/i)
+    resolveProjects(jsonResponse(PROJECTS))
+    await screen.findByText('Website redesign')
+  })
+})
+
+describe('Polish — "New screens meet the accessibility bar"', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('board cards expose a Move control — the keyboard path for drag', async () => {
+    localStorage.setItem('taskflow.view.5', 'board')
+    renderAt('/projects/5')
+    await screen.findByText('Write copy')
+    const card = screen.getByText('Write copy').closest('li')!
+    expect(within(card as HTMLElement).getByRole('button', { name: /^move$/i })).toBeTruthy()
+  })
+
+  it('view toggle buttons expose pressed state', async () => {
+    renderAt('/projects/5')
+    await screen.findByText('Write copy')
+    const listBtn = screen.getByRole('button', { name: /^list$/i })
+    const boardBtn = screen.getByRole('button', { name: /^board$/i })
+    expect(listBtn.getAttribute('aria-pressed')).toBe('true')
+    expect(boardBtn.getAttribute('aria-pressed')).toBe('false')
+    fireEvent.click(boardBtn)
+    expect(boardBtn.getAttribute('aria-pressed')).toBe('true')
+  })
+
+  it('every button on the projects screens has an accessible name', async () => {
+    const { container } = renderAt('/projects')
+    await screen.findByText('Website redesign')
+    for (const btn of Array.from(container.querySelectorAll('button'))) {
+      const name =
+        btn.getAttribute('aria-label') ??
+        btn.textContent?.trim() ??
+        btn.getAttribute('title')
+      expect(name, `button without accessible name: ${btn.outerHTML.slice(0, 80)}`).toBeTruthy()
+    }
+  })
+})

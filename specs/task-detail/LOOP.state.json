@@ -1,0 +1,17 @@
+{
+  "feature": "task-detail",
+  "status": "running",
+  "iterations": 0,
+  "updated": "2026-11-19T19:29:30Z",
+  "waves": {},
+  "gates": {
+    "G1": {
+      "status": "met",
+      "evidence": "specs/task-detail/DECISION-REVIEW.md \u2014 verdict REVISE answered: D1 schema contract (uq_tasks_id_workspace + cascade FK),",
+      "updated": "2026-11-19T19:29:30Z"
+    }
+  },
+  "events": [
+    "2026-11-19T19:29:30Z gate G1 met: specs/task-detail/DECISION-REVIEW.md \u2014 verdict REVISE answered: D1 schema contract (uq_tasks_id_workspace + cascade FK),"
+  ]
+}

@@ -1,25 +1,48 @@
-# Spec audit: action-a11y
+# Delivery audit — action-a11y (spec)
 
-> Independent audit (D013) before wave planning. Small spec; findings
-> from the decision challenge were folded and re-verified.
+- Repo: `~/factory/openharness/sources/taskflow`
+- Spec: `specs/action-a11y`
+- Generated: 2026-11-20T13:00:56Z
+- Phase: **spec**
+- Findings: **0 blockers · 0 concerns · 0 unverified**
+- This is a deterministic evidence brief, not a verdict. The `delivery-auditor` re-verifies it and fills the verdict.
 
-## Verdict: PASS (post-fold)
+## What was checked
 
-## Verified
+- Acceptance criteria: 5
+- Scenarios: 6 (2 wave tags)
+- Backlog items: 2
+- Waves: 2
+- Gates: 1
+- Validation rows: 0
+- Path claims checked: 4
+- Changed files: 0
+- In-scope paths: `frontend/src/__tests__/drawer.test.tsx`, `frontend/src/__tests__/projects.test.tsx`
 
-- `TaskItem` Edit/Delete render only in read state; Save/Cancel scoped
-  inside the edit form; single `editingId` means one edit form at a time.
-- `BoardView` Move toggle is the only per-card action; move-form submit
-  correctly excluded (scoped inside one card's form).
-- `CommentThread` Edit/Delete confirmed label-less — now in scope.
-- Only `/projects` has the PageHeader+Card title collision; dashboard and
-  account headings don't collide.
-- `Button` spreads `ButtonHTMLAttributes` — `aria-label` passes through.
-- Test-migration targets named: `drawer.test.tsx` board-Move query,
-  `projects.test.tsx` board-Move query; move-form submit unaffected.
-- 6 scenarios across 2 waves; BACKLOG parses; G1 satisfied.
+## Blockers
 
-## Notes
+None. This is not a pass: verify semantics before accepting.
 
-- Member `Remove` labels deferred to `workspace-pane` scope-out —
-  tracked there, not a gap.
+## Concerns
+
+None.
+
+## Unverified
+
+None.
+
+## Verdict (agent fills after verifying the code)
+
+```
+AUDIT: PASS | CONCERNS | BLOCK
+PHASE: spec | delivery
+BLOCKERS: <confirmed count and why>
+CONCERNS: <accepted concerns and why>
+UNVERIFIED: <what could not be checked>
+EVIDENCE: <commands run, files read, tests observed>
+```
+
+Rules: `BLOCK` on any confirmed blocker, hallucinated claim, or
+unproven acceptance criterion. `CONCERNS` only when every remaining
+item is non-blocking and explicitly accepted. `PASS` only when all
+three lists are empty. Never mark `PASS` from this brief alone.

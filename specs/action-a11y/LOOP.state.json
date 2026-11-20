@@ -1,0 +1,17 @@
+{
+  "feature": "action-a11y",
+  "status": "running",
+  "iterations": 0,
+  "updated": "2026-11-20T13:00:00Z",
+  "waves": {},
+  "gates": {
+    "G1": {
+      "status": "met",
+      "evidence": "specs/action-a11y/DECISION-REVIEW.md (REVISE \u2192 findings folded; spec audit PASS post-fold)",
+      "updated": "2026-11-20T13:00:00Z"
+    }
+  },
+  "events": [
+    "2026-11-20T13:00:00Z gate G1 met: specs/action-a11y/DECISION-REVIEW.md (REVISE \u2192 findings folded; spec audit PASS post-fold)"
+  ]
+}

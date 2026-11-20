@@ -53,6 +53,11 @@ and the heading dedupe.
 - **Heading dedupe**: the `/projects` page shows "Projects" once — the
   PageHeader keeps the H1; the card title changes to a non-duplicative
   label (e.g. "All projects") or is removed if redundant.
+- **Member remove label**: the workspace manage drawer's per-member
+  "Remove" button gets an `aria-label` naming the member (e.g.
+  `Remove Demo User`) — the same repeated-name defect. Pulled into scope
+  after audit found the workspace-pane delegation never happened
+  (WorkspaceDrawer renders a bare "Remove").
 - **Test migration**: `drawer.test.tsx` (board Move name query) and
   `projects.test.tsx` (board Move name query) are updated to match the
   new accessible names — `aria-label` replaces the accessible name, so
@@ -62,8 +67,9 @@ and the heading dedupe.
 
 ## Scope (out)
 
-- Workspace/account page changes — owned by `workspace-pane` (its drawer
-  rebuild includes member-action labels).
+- Other workspace/account changes — the member-Remove label is the only
+  workspace-side item pulled in (delegation to workspace-pane was found
+  not to have happened); everything else stays out.
 - Drawer, form, or routing changes — none needed.
 - Visible button text changes (labels are `aria-label` only; sighted
   users keep the compact Edit/Delete/Move text).
@@ -73,16 +79,17 @@ and the heading dedupe.
 
 ## Acceptance criteria
 
-1. Every Edit/Delete button in the task list view has an accessible name
-   containing the task's title; two different tasks yield different
-   names.
-2. Every Move toggle in the board view has an accessible name containing
-   the task's title; the move-form submit keeps its bare "Move" name.
-3. Every comment Edit/Delete button has an accessible name identifying
-   the comment's author.
-4. The `/projects` page renders "Projects" as a single heading.
-5. Tests and build stay green (existing name queries migrated); no
-   visual regression (visible text unchanged).
+<!-- Scenario(s): use scenario names verbatim from EXAMPLES.feature and/or
+     @w<N> tags — ship_validate resolves both for traceability. -->
+
+| # | Criterion | Scenario(s) |
+|---|-----------|-------------|
+| 1 | Every Edit/Delete button in the task list view has an accessible name containing the task's title; two different tasks yield different names | Task list actions name their task; Inline edit actions stay scoped |
+| 2 | Every Move toggle in the board view has an accessible name containing the task's title; the move-form submit keeps its bare "Move" name | Board move control names its task |
+| 3 | Every comment Edit/Delete button has an accessible name identifying the comment's author | Comment actions name their author |
+| 4 | The `/projects` page renders "Projects" as a single heading | Projects page shows one Projects heading |
+| 5 | Tests and build stay green (existing name queries migrated — drawer.test.tsx, projects.test.tsx, task-detail.test.tsx); no visual regression (visible text unchanged); labels identical in both themes | Action labels work in both themes |
+| 6 | Member remove buttons in the workspace manage drawer name their member | Member remove action names the member |
 
 ## Decisions (preliminary)
 

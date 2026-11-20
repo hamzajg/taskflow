@@ -49,7 +49,7 @@ export default function ProjectsPage() {
         </Card>
       ) : (
         <Card
-          title="Projects"
+          title="All projects"
           actions={
             <>
               <span className="muted">

@@ -6,7 +6,9 @@ import RegisterPage from './pages/RegisterPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
-import HomePage from './pages/HomePage'
+import LandingPage from './pages/LandingPage'
+import DashboardPage from './pages/DashboardPage'
+import AccountPage from './pages/AccountPage'
 import ProjectsPage from './pages/ProjectsPage'
 import ProjectDetailPage from './pages/ProjectDetailPage'
 import TaskDetailPage from './pages/TaskDetailPage'
@@ -25,18 +27,28 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route
+        path="/"
+        element={
+          isLoggedIn() ? <Navigate to="/dashboard" replace /> : <LandingPage />
+        }
+      />
+      <Route
         element={
           <RequireAuth>
             <AppShell />
           </RequireAuth>
         }
       >
-        <Route index element={<HomePage />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="account" element={<AccountPage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="projects/:id" element={<ProjectDetailPage />} />
         <Route path="tasks/:id" element={<TaskDetailPage />} />
       </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route
+        path="*"
+        element={<Navigate to={isLoggedIn() ? '/dashboard' : '/'} replace />}
+      />
     </Routes>
   )
 }

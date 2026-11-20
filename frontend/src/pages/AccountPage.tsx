@@ -8,7 +8,7 @@ import Input from '../components/Input'
 import { useShell } from '../shell/ShellContext'
 import WorkspacePanel from './WorkspacePanel'
 
-export default function HomePage() {
+export default function AccountPage() {
   const { user, workspaces, refreshWorkspaces, setUser } = useShell()
   const [profile, setProfile] = useState({ firstName: '', lastName: '' })
   const [profileMsg, setProfileMsg] = useState('')

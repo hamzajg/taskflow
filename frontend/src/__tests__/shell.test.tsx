@@ -34,7 +34,7 @@ function mockApi() {
 function renderAuthed() {
   setSession({ token: 'test-token', user: USER })
   return render(
-    <MemoryRouter initialEntries={['/']}>
+    <MemoryRouter initialEntries={['/account']}>
       <App />
     </MemoryRouter>,
   )

@@ -1,5 +1,5 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react'
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { FolderKanban, LayoutDashboard, ListTodo, LogOut, Menu, Moon, Sun, User as UserIcon, X } from 'lucide-react'
 import { api } from '../api'
 import { clearSession, getUser, saveUser, User } from '../auth'
@@ -11,15 +11,15 @@ import { WorkspaceDto } from '../pages/workspaceTypes'
 interface NavEntry {
   label: string
   icon: ReactNode
-  to?: string
+  to: string
   hash?: string
 }
 
 const NAV: NavEntry[] = [
-  { label: 'Dashboard', icon: <LayoutDashboard size={18} />, to: '/' },
+  { label: 'Dashboard', icon: <LayoutDashboard size={18} />, to: '/dashboard' },
   { label: 'Projects', icon: <ListTodo size={18} />, to: '/projects' },
-  { label: 'Workspaces', icon: <FolderKanban size={18} />, hash: '#workspaces' },
-  { label: 'Profile', icon: <UserIcon size={18} />, hash: '#profile' },
+  { label: 'Workspaces', icon: <FolderKanban size={18} />, to: '/account', hash: '#workspaces' },
+  { label: 'Profile', icon: <UserIcon size={18} />, to: '/account', hash: '#profile' },
 ]
 
 export default function AppShell() {
@@ -80,30 +80,18 @@ export default function AppShell() {
         </div>
 
         <nav className="sidebar-nav">
-          {NAV.map((item) =>
-            item.to ? (
-              <NavLink
-                key={item.label}
-                to={item.to}
-                end
-                className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-                onClick={() => setNavOpen(false)}
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </NavLink>
-            ) : (
-              <Link
-                key={item.label}
-                to={{ pathname: '/', hash: item.hash }}
-                className="nav-link"
-                onClick={() => setNavOpen(false)}
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </Link>
-            ),
-          )}
+          {NAV.map((item) => (
+            <NavLink
+              key={item.label}
+              to={{ pathname: item.to, hash: item.hash }}
+              end={!item.hash}
+              className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+              onClick={() => setNavOpen(false)}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
         </nav>
 
         {workspaces.length > 0 && (

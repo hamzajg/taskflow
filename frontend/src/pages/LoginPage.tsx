@@ -19,7 +19,7 @@ export default function LoginPage() {
     try {
       const res = await api.post<AuthResponse>('/auth/login', { email, password })
       setSession(res)
-      navigate('/')
+      navigate('/dashboard')
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Login failed')
     }

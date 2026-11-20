@@ -13,6 +13,8 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,10 +80,14 @@ public class WorkspaceResourceTest {
                 .body("role", equalTo("owner"))
                 .body("memberCount", equalTo(1));
 
-        given().header("Authorization", auth)
+        // Default workspace (auto-provisioned at login) + the created one.
+        List<Map<String, Object>> workspaces = given().header("Authorization", auth)
                 .when().get("/workspaces")
                 .then().statusCode(200)
-                .body("$", hasSize(1));
+                .extract().jsonPath().getList("$");
+        assertEquals(2, workspaces.size());
+        assertTrue(workspaces.stream().anyMatch(w ->
+                "Acme Team".equals(w.get("name")) && "owner".equals(w.get("role"))));
     }
 
     @Test
@@ -110,10 +116,14 @@ public class WorkspaceResourceTest {
                 .body("id", equalTo((int) wsId))
                 .body("role", equalTo("member"));
 
-        given().header("Authorization", memberAuth)
+        // Member's default workspace + the accepted invite.
+        List<Map<String, Object>> memberWorkspaces = given().header("Authorization", memberAuth)
                 .when().get("/workspaces")
                 .then().statusCode(200)
-                .body("$", hasSize(1));
+                .extract().jsonPath().getList("$");
+        assertEquals(2, memberWorkspaces.size());
+        assertTrue(memberWorkspaces.stream().anyMatch(w ->
+                "Studio".equals(w.get("name")) && "member".equals(w.get("role"))));
 
         given().header("Authorization", ownerAuth)
                 .when().get("/workspaces/" + wsId + "/members")
@@ -252,12 +262,15 @@ public class WorkspaceResourceTest {
                 .extract().path("id")).longValue();
         long ownerBId = ownerB.jsonPath().getLong("user.id");
 
-        // B sees only their own workspace.
-        given().header("Authorization", authB)
+        // B sees only their own workspaces (default + Workspace B), never A.
+        List<Map<String, Object>> bWorkspaces = given().header("Authorization", authB)
                 .when().get("/workspaces")
                 .then().statusCode(200)
-                .body("$", hasSize(1))
-                .body("[0].id", equalTo((int) wsB));
+                .extract().jsonPath().getList("$");
+        assertEquals(2, bWorkspaces.size());
+        List<Long> bIds = bWorkspaces.stream().map(w -> ((Number) w.get("id")).longValue()).toList();
+        assertTrue(bIds.contains(wsB));
+        assertFalse(bIds.contains(wsA));
 
         // B cannot read, rename, or list members of A.
         given().header("Authorization", authB)
@@ -426,10 +439,11 @@ public class WorkspaceResourceTest {
                     .when().post("/workspaces").then().statusCode(201);
         }
 
+        // Default workspace + Alpha + Beta.
         given().header("Authorization", auth)
                 .when().get("/workspaces")
                 .then().statusCode(200)
-                .body("$", hasSize(2));
+                .body("$", hasSize(3));
     }
 }
 

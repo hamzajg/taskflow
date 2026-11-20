@@ -27,6 +27,9 @@ public class AuthService {
     @Inject
     JwtService jwtService;
 
+    @Inject
+    DefaultWorkspaceService defaultWorkspaceService;
+
     @ConfigProperty(name = "app.base-url", defaultValue = "http://localhost:8080")
     String baseUrl;
 
@@ -58,6 +61,7 @@ public class AuthService {
         if (user == null || !JwtService.checkPassword(password, user.password)) {
             throw new WebApplicationException("Invalid email or password", Response.Status.UNAUTHORIZED);
         }
+        defaultWorkspaceService.ensureFor(user);
         return new AuthResponse(jwtService.issueToken(user), UserDto.of(user));
     }
 

@@ -204,6 +204,17 @@ public class TimeEntryResourceTest {
                 .then().statusCode(200)
                 .body("minutes", is(90));
 
+        // owner (admin path) deletes the member's entry — but first re-log
+        // since PATCH validation below needs a live entry
+        long entry2 = logEntry(memberAuth, taskId, 30, null);
+        given().header("Authorization", memberAuth).contentType(ContentType.JSON)
+                .body("{\"description\":\"" + "x".repeat(501) + "\"}")
+                .when().patch("/time-entries/" + entry2)
+                .then().statusCode(400);
+        given().header("Authorization", memberAuth)
+                .when().delete("/time-entries/" + entry2)
+                .then().statusCode(204);
+
         // owner cannot edit the member's entry
         given().header("Authorization", ownerAuth).contentType(ContentType.JSON)
                 .body("{\"minutes\":5}")

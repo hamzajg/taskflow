@@ -92,6 +92,9 @@ public class TimeEntryService {
             e.minutes = minutes;
         }
         if (description != null) {
+            if (description.trim().length() > TimeEntry.MAX_DESCRIPTION_LENGTH) {
+                throw badRequest("description is too long");
+            }
             e.description = cleanDescription(description);
         }
         e.updatedAt = Instant.now();

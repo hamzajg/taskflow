@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { ReactNode } from 'react'
 import { isLoggedIn } from './auth'
 import LoginPage from './pages/LoginPage'
@@ -17,6 +17,12 @@ import AppShell from './components/AppShell'
 
 function RequireAuth({ children }: { children: ReactNode }) {
   return isLoggedIn() ? <>{children}</> : <Navigate to="/login" replace />
+}
+
+// Legacy /account#profile bookmarks land on the dedicated /profile page.
+function AccountRoute() {
+  const { hash } = useLocation()
+  return hash === '#profile' ? <Navigate to="/profile" replace /> : <AccountPage />
 }
 
 export default function App() {
@@ -41,7 +47,7 @@ export default function App() {
         }
       >
         <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="account" element={<AccountPage />} />
+        <Route path="account" element={<AccountRoute />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="projects/:id" element={<ProjectDetailPage />} />

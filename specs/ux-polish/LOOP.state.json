@@ -2,7 +2,7 @@
   "feature": "ux-polish",
   "status": "running",
   "iterations": 0,
-  "updated": "2026-11-20T18:49:40Z",
+  "updated": "2026-11-20T19:03:23Z",
   "waves": {
     "1": {
       "status": "done",
@@ -12,11 +12,11 @@
       "updated": "2026-11-20T18:37:46Z"
     },
     "2": {
-      "status": "in-progress",
+      "status": "done",
       "branch": "feat/ux-polish-w2",
-      "pr": "\u2014",
-      "evidence": "\u2014",
-      "updated": "2026-11-20T18:49:40Z"
+      "pr": "#61",
+      "evidence": "frontend 150/150, build clean, evidence verified",
+      "updated": "2026-11-20T19:03:23Z"
     }
   },
   "gates": {
@@ -30,6 +30,7 @@
     "2026-11-20T18:34:13Z gate G1 met: specs/ux-polish/DECISION-REVIEW.md",
     "2026-11-20T18:34:13Z start wave 1 on feat/ux-polish-w1",
     "2026-11-20T18:37:46Z complete wave 1 (#60): backend 65/65, WorkspaceSummaryTest 5/5, evidence verified",
-    "2026-11-20T18:49:40Z start wave 2 on feat/ux-polish-w2"
+    "2026-11-20T18:49:40Z start wave 2 on feat/ux-polish-w2",
+    "2026-11-20T19:03:23Z complete wave 2 (#61): frontend 150/150, build clean, evidence verified"
   ]
 }

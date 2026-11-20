@@ -2,34 +2,23 @@ import { FormEvent, MouseEvent, useCallback, useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { api, ApiError } from '../api'
 import Alert from '../components/Alert'
-import Badge from '../components/Badge'
 import Button from '../components/Button'
 import Card from '../components/Card'
-import Input from '../components/Input'
 import PageHeader from '../components/PageHeader'
-import Select from '../components/Select'
+import TaskFormFields, { TaskFormValue } from '../components/TaskFormFields'
+import TaskItem from '../components/TaskItem'
+import ViewToggle from '../components/ViewToggle'
 import BoardView from './BoardView'
 import TaskDrawer from './TaskDrawer'
 import {
   MemberDto,
-  priorityTone,
   ProjectDto,
   statusLabel,
-  TASK_PRIORITIES,
   TASK_STATUSES,
   TaskDto,
 } from './projectTypes'
 
-interface TaskForm {
-  title: string
-  description: string
-  status: string
-  priority: string
-  assigneeId: string
-  dueDate: string
-}
-
-const EMPTY_FORM: TaskForm = {
+const EMPTY_FORM: TaskFormValue = {
   title: '',
   description: '',
   status: 'todo',
@@ -38,7 +27,7 @@ const EMPTY_FORM: TaskForm = {
   dueDate: '',
 }
 
-function formFromTask(t: TaskDto): TaskForm {
+function formFromTask(t: TaskDto): TaskFormValue {
   return {
     title: t.title,
     description: t.description ?? '',
@@ -63,11 +52,11 @@ export default function ProjectDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const [form, setForm] = useState<TaskForm>(EMPTY_FORM)
+  const [form, setForm] = useState<TaskFormValue>(EMPTY_FORM)
   const [formError, setFormError] = useState('')
   const [actionError, setActionError] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
-  const [editForm, setEditForm] = useState<TaskForm>(EMPTY_FORM)
+  const [editForm, setEditForm] = useState<TaskFormValue>(EMPTY_FORM)
   const [view, setView] = useState<'list' | 'board'>(() =>
     localStorage.getItem(`taskflow.view.${projectId}`) === 'board'
       ? 'board'
@@ -133,17 +122,7 @@ export default function ProjectDetailPage() {
     load()
   }, [load])
 
-  const memberOptions = [
-    { value: '', label: 'Unassigned' },
-    ...members.map((m) => ({ value: String(m.userId), label: m.displayName })),
-  ]
-  const statusOptions = TASK_STATUSES.map((s) => ({ value: s, label: statusLabel(s) }))
-  const priorityOptions = TASK_PRIORITIES.map((p) => ({
-    value: p,
-    label: p[0].toUpperCase() + p.slice(1),
-  }))
-
-  function payload(f: TaskForm) {
+  function payload(f: TaskFormValue) {
     return {
       title: f.title,
       description: f.description,
@@ -244,43 +223,11 @@ export default function ProjectDetailPage() {
       <Card title="New task">
         {formError && <Alert>{formError}</Alert>}
         <form className="task-form" onSubmit={createTask}>
-          <Input
-            label="Title"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            required
+          <TaskFormFields
+            value={form}
+            onField={(f, v) => setForm((prev) => ({ ...prev, [f]: v }))}
+            members={members}
           />
-          <Input
-            label="Description"
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-          />
-          <div className="task-form-grid">
-            <Select
-              label="Status"
-              value={form.status}
-              onChange={(e) => setForm({ ...form, status: e.target.value })}
-              options={statusOptions}
-            />
-            <Select
-              label="Priority"
-              value={form.priority}
-              onChange={(e) => setForm({ ...form, priority: e.target.value })}
-              options={priorityOptions}
-            />
-            <Select
-              label="Assignee"
-              value={form.assigneeId}
-              onChange={(e) => setForm({ ...form, assigneeId: e.target.value })}
-              options={memberOptions}
-            />
-            <Input
-              label="Due date"
-              type="date"
-              value={form.dueDate}
-              onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
-            />
-          </div>
           <div>
             <Button type="submit">Add task</Button>
           </div>
@@ -289,26 +236,7 @@ export default function ProjectDetailPage() {
 
       <Card
         title="Tasks"
-        actions={
-          <div className="view-toggle" role="group" aria-label="Task view">
-            <Button
-              variant={view === 'list' ? 'secondary' : 'link'}
-              size="sm"
-              aria-pressed={view === 'list'}
-              onClick={() => switchView('list')}
-            >
-              List
-            </Button>
-            <Button
-              variant={view === 'board' ? 'secondary' : 'link'}
-              size="sm"
-              aria-pressed={view === 'board'}
-              onClick={() => switchView('board')}
-            >
-              Board
-            </Button>
-          </div>
-        }
+        actions={<ViewToggle view={view} onChange={switchView} />}
       >
         {actionError && <Alert>{actionError}</Alert>}
         {tasks === null ? (
@@ -332,116 +260,24 @@ export default function ProjectDetailPage() {
               </h3>
               <ul className="task-list">
                 {g.items.map((t) => (
-                  <li key={t.id} className="task-item">
-                    {editingId === t.id ? (
-                      <form className="task-form" onSubmit={saveEdit}>
-                        <Input
-                          label="Title" id="edit-title"
-                          value={editForm.title}
-                          onChange={(e) =>
-                            setEditForm({ ...editForm, title: e.target.value })
-                          }
-                          required
-                        />
-                        <Input
-                          label="Description" id="edit-description"
-                          value={editForm.description}
-                          onChange={(e) =>
-                            setEditForm({ ...editForm, description: e.target.value })
-                          }
-                        />
-                        <div className="task-form-grid">
-                          <Select
-                            label="Status" id="edit-status"
-                            value={editForm.status}
-                            onChange={(e) =>
-                              setEditForm({ ...editForm, status: e.target.value })
-                            }
-                            options={statusOptions}
-                          />
-                          <Select
-                            label="Priority" id="edit-priority"
-                            value={editForm.priority}
-                            onChange={(e) =>
-                              setEditForm({ ...editForm, priority: e.target.value })
-                            }
-                            options={priorityOptions}
-                          />
-                          <Select
-                            label="Assignee" id="edit-assignee"
-                            value={editForm.assigneeId}
-                            onChange={(e) =>
-                              setEditForm({ ...editForm, assigneeId: e.target.value })
-                            }
-                            options={memberOptions}
-                          />
-                          <Input
-                            label="Due date" id="edit-due-date"
-                            type="date"
-                            value={editForm.dueDate}
-                            onChange={(e) =>
-                              setEditForm({ ...editForm, dueDate: e.target.value })
-                            }
-                          />
-                        </div>
-                        <div className="task-actions">
-                          <Button type="submit" size="sm">
-                            Save
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => setEditingId(null)}
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      </form>
-                    ) : (
-                      <>
-                        <div className="task-main">
-                          <strong>
-                            <Link
-                              to={`/tasks/${t.id}`}
-                              onClick={(e) => openTaskDrawer(e, t.id)}
-                            >
-                              {t.title}
-                            </Link>
-                          </strong>
-                          {t.description && (
-                            <p className="muted task-desc">{t.description}</p>
-                          )}
-                          <div className="task-meta">
-                            <Badge tone={priorityTone(t.priority)}>{t.priority}</Badge>
-                            <span className="muted">
-                              {t.assigneeName ?? 'Unassigned'}
-                            </span>
-                            {t.dueDate && <span className="muted">Due {t.dueDate}</span>}
-                          </div>
-                        </div>
-                        <div className="task-actions">
-                          <Button
-                            variant="link"
-                            size="sm"
-                            onClick={() => {
-                              setEditingId(t.id)
-                              setEditForm(formFromTask(t))
-                            }}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="link"
-                            size="sm"
-                            onClick={() => removeTask(t.id)}
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </>
-                    )}
-                  </li>
+                  <TaskItem
+                    key={t.id}
+                    task={t}
+                    editing={editingId === t.id}
+                    editForm={editForm}
+                    onEditField={(f, v) =>
+                      setEditForm((prev) => ({ ...prev, [f]: v }))
+                    }
+                    onStartEdit={() => {
+                      setEditingId(t.id)
+                      setEditForm(formFromTask(t))
+                    }}
+                    onCancelEdit={() => setEditingId(null)}
+                    onSaveEdit={saveEdit}
+                    onDelete={() => removeTask(t.id)}
+                    onOpenTask={openTaskDrawer}
+                    members={members}
+                  />
                 ))}
               </ul>
             </section>

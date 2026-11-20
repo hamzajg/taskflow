@@ -22,6 +22,21 @@ export interface TaskDto {
   createdAt: string
 }
 
+export interface CommentDto {
+  id: number
+  taskId: number
+  authorId: number
+  authorName: string
+  body: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CommentList {
+  comments: CommentDto[]
+  hasMore: boolean
+}
+
 export interface MemberDto {
   userId: number
   displayName: string

@@ -673,3 +673,74 @@ button:focus-visible {
     grid-template-columns: repeat(2, minmax(200px, 1fr));
   }
 }
+
+/* ---------- task detail + comments ---------- */
+
+.task-detail {
+  max-width: 760px;
+}
+
+.task-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+}
+
+.task-fields dt {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.task-fields dd {
+  margin: 0;
+}
+
+.comment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-4);
+}
+
+.comment-item {
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.comment-item:last-child {
+  border-bottom: none;
+}
+
+.comment-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.comment-head .muted {
+  font-size: var(--font-size-sm);
+}
+
+.comment-body {
+  margin: var(--space-1) 0 0;
+  white-space: pre-wrap;
+}
+
+.comment-form,
+.comment-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.comment-form textarea,
+.comment-edit-form textarea {
+  font: inherit;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  resize: vertical;
+}

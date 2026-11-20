@@ -368,7 +368,9 @@ export default function ProjectDetailPage() {
                     ) : (
                       <>
                         <div className="task-main">
-                          <strong>{t.title}</strong>
+                          <strong>
+                            <Link to={`/tasks/${t.id}`}>{t.title}</Link>
+                          </strong>
                           {t.description && (
                             <p className="muted task-desc">{t.description}</p>
                           )}

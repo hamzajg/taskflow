@@ -2,8 +2,16 @@
   "feature": "project-tags",
   "status": "running",
   "iterations": 1,
-  "updated": "2026-11-20T13:44:31Z",
-  "waves": {},
+  "updated": "2026-11-20T13:49:01Z",
+  "waves": {
+    "1": {
+      "status": "done",
+      "branch": "feat/project-tags-w1",
+      "pr": "\u2014",
+      "evidence": "backend 58/58 (10 new tag tests); evidence 20261120T134735Z-eb2e23c verified",
+      "updated": "2026-11-20T13:49:01Z"
+    }
+  },
   "gates": {
     "G1": {
       "status": "met",
@@ -12,6 +20,8 @@
     }
   },
   "events": [
-    "2026-11-20T13:44:25Z gate G1 met: specs/project-tags/DECISION-REVIEW.md"
+    "2026-11-20T13:44:25Z gate G1 met: specs/project-tags/DECISION-REVIEW.md",
+    "2026-11-20T13:48:59Z start wave 1 on feat/project-tags-w1",
+    "2026-11-20T13:49:01Z complete wave 1: backend 58/58 (10 new tag tests); evidence 20261120T134735Z-eb2e23c verified"
   ]
 }

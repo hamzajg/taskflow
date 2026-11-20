@@ -5,10 +5,14 @@ import Alert from '../components/Alert'
 import Button from '../components/Button'
 import Card from '../components/Card'
 import PageHeader from '../components/PageHeader'
-import TaskFormFields, { TaskFormValue } from '../components/TaskFormFields'
+import {
+  EMPTY_TASK_FORM,
+  TaskFormValue,
+} from '../components/TaskFormFields'
 import TaskItem from '../components/TaskItem'
 import ViewToggle from '../components/ViewToggle'
 import BoardView from './BoardView'
+import TaskCreateDrawer from './TaskCreateDrawer'
 import TaskDrawer from './TaskDrawer'
 import {
   MemberDto,
@@ -17,15 +21,6 @@ import {
   TASK_STATUSES,
   TaskDto,
 } from './projectTypes'
-
-const EMPTY_FORM: TaskFormValue = {
-  title: '',
-  description: '',
-  status: 'todo',
-  priority: 'medium',
-  assigneeId: '',
-  dueDate: '',
-}
 
 function formFromTask(t: TaskDto): TaskFormValue {
   return {
@@ -52,11 +47,10 @@ export default function ProjectDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const [form, setForm] = useState<TaskFormValue>(EMPTY_FORM)
-  const [formError, setFormError] = useState('')
   const [actionError, setActionError] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
-  const [editForm, setEditForm] = useState<TaskFormValue>(EMPTY_FORM)
+  const [editForm, setEditForm] = useState<TaskFormValue>(EMPTY_TASK_FORM)
+  const [createOpen, setCreateOpen] = useState(false)
   const [view, setView] = useState<'list' | 'board'>(() =>
     localStorage.getItem(`taskflow.view.${projectId}`) === 'board'
       ? 'board'
@@ -85,6 +79,12 @@ export default function ProjectDetailPage() {
 
   function closeTaskDrawer() {
     setSearchParams({}, { replace: true })
+  }
+
+  // at most one drawer open: creating clears any open peek (?task=)
+  function openCreateDrawer() {
+    if (drawerTaskId !== null) closeTaskDrawer()
+    setCreateOpen(true)
   }
 
   async function moveTask(taskId: number, status: string, position: number) {
@@ -121,29 +121,6 @@ export default function ProjectDetailPage() {
   useEffect(() => {
     load()
   }, [load])
-
-  function payload(f: TaskFormValue) {
-    return {
-      title: f.title,
-      description: f.description,
-      status: f.status,
-      priority: f.priority,
-      assigneeId: f.assigneeId === '' ? undefined : Number(f.assigneeId),
-      dueDate: f.dueDate === '' ? undefined : f.dueDate,
-    }
-  }
-
-  async function createTask(e: FormEvent) {
-    e.preventDefault()
-    setFormError('')
-    try {
-      await api.post(`/projects/${projectId}/tasks`, payload(form))
-      setForm(EMPTY_FORM)
-      await load()
-    } catch (err) {
-      setFormError(err instanceof ApiError ? err.message : 'Create failed')
-    }
-  }
 
   async function saveEdit(e: FormEvent) {
     e.preventDefault()
@@ -220,23 +197,16 @@ export default function ProjectDetailPage() {
         }
       />
 
-      <Card title="New task">
-        {formError && <Alert>{formError}</Alert>}
-        <form className="task-form" onSubmit={createTask}>
-          <TaskFormFields
-            value={form}
-            onField={(f, v) => setForm((prev) => ({ ...prev, [f]: v }))}
-            members={members}
-          />
-          <div>
-            <Button type="submit">Add task</Button>
-          </div>
-        </form>
-      </Card>
-
       <Card
         title="Tasks"
-        actions={<ViewToggle view={view} onChange={switchView} />}
+        actions={
+          <>
+            <ViewToggle view={view} onChange={switchView} />
+            <Button size="sm" onClick={openCreateDrawer}>
+              Add task
+            </Button>
+          </>
+        }
       >
         {actionError && <Alert>{actionError}</Alert>}
         {tasks === null ? (
@@ -244,7 +214,7 @@ export default function ProjectDetailPage() {
             Loading…
           </p>
         ) : tasks.length === 0 ? (
-          <p className="muted">No tasks yet — create the first one above.</p>
+          <p className="muted">No tasks yet — use “Add task” to create the first one.</p>
         ) : view === 'board' ? (
           <BoardView
             tasks={tasks}
@@ -289,6 +259,13 @@ export default function ProjectDetailPage() {
         taskId={drawerTaskId}
         open={drawerTaskId !== null}
         onClose={closeTaskDrawer}
+      />
+      <TaskCreateDrawer
+        open={createOpen}
+        projectId={projectId}
+        members={members}
+        onClose={() => setCreateOpen(false)}
+        onCreated={load}
       />
     </>
   )

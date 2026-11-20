@@ -413,6 +413,48 @@ describe('workspace-pane — "Account page shows no inline workspace forms" (@w2
   })
 })
 
+describe('workspace-pane — "Workspace drawers meet the accessibility bar in both themes" (@w3)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('manage drawer is a labelled modal with keyboard-reachable fields and focus return', async () => {
+    renderAt()
+    const opener = await screen.findByRole('button', { name: 'Acme' })
+    opener.focus()
+    const dialog = (await openWorkspaceDrawer()) as HTMLElement
+    expect(dialog.getAttribute('role')).toBe('dialog')
+    expect(dialog.getAttribute('aria-modal')).toBe('true')
+    expect(dialog.getAttribute('aria-label')).toBeTruthy()
+    // labelled, focusable fields inside
+    const rename = within(dialog).getByLabelText(/rename workspace/i)
+    rename.focus()
+    expect(document.activeElement).toBe(rename)
+    // Escape returns focus to the opener
+    fireEvent.keyDown(document, { key: 'Escape' })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    expect(document.activeElement).toBe(opener)
+  })
+
+  it('create drawer exposes the same bar', async () => {
+    renderAt()
+    await screen.findByRole('button', { name: 'Acme' })
+    fireEvent.click(screen.getByRole('button', { name: 'New workspace' }))
+    const dialog = (await screen.findByRole('dialog')) as HTMLElement
+    expect(dialog.getAttribute('aria-modal')).toBe('true')
+    expect(within(dialog).getByLabelText(/name/i)).toBeTruthy()
+    expect(
+      within(dialog).getByRole('button', { name: 'Create workspace' }),
+    ).toBeTruthy()
+  })
+})
+
 describe('workspace-pane — "Sidebar workspace switching still works" (@w1)', () => {
   beforeEach(() => {
     localStorage.clear()

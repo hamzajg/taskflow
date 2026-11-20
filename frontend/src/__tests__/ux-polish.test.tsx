@@ -253,6 +253,8 @@ describe('ux-polish @w2 — "Time section works inside the task drawer"', () => 
     // row chip + project aggregate refresh via silent reload
     expect(await screen.findByText('45m logged')).toBeTruthy()
     expect(await screen.findByText(/Total time: 45m/)).toBeTruthy()
+    // the drawer's own Total header refreshes too (audit fix)
+    expect(await within(drawer).findByText('Total: 45m')).toBeTruthy()
   })
 })
 
@@ -327,5 +329,18 @@ describe('ux-polish @w2 — "Board view is deep-linkable via the view param"', (
     localStorage.setItem('taskflow.view.5', 'board')
     const { container } = renderAt('/projects/5')
     await waitFor(() => expect(container.querySelector('.board')).toBeTruthy())
+  })
+})
+
+describe('ux-polish audit — safeCssColor', () => {
+  it('accepts hex and named colors, rejects css smuggling', async () => {
+    const { safeCssColor } = await import('../pages/projectTypes')
+    expect(safeCssColor('#7c3aed')).toBe('#7c3aed')
+    expect(safeCssColor('#fff')).toBe('#fff')
+    expect(safeCssColor('steelblue')).toBe('steelblue')
+    expect(safeCssColor('url(https://evil.example/x)')).toBeUndefined()
+    expect(safeCssColor('expression(alert(1))')).toBeUndefined()
+    expect(safeCssColor('red; background: url(x)')).toBeUndefined()
+    expect(safeCssColor(null)).toBeUndefined()
   })
 })

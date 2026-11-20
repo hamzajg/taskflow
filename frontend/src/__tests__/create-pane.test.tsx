@@ -377,6 +377,53 @@ describe('create-pane — "Inline creation forms are gone" (@w2)', () => {
   })
 })
 
+describe('create-pane — "Creation drawers meet the accessibility bar in both themes" (@w3)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('task create drawer is a labelled modal with keyboard-reachable labelled fields and submit', async () => {
+    renderAt('/projects')
+    await openProjectPage()
+    const opener = screen.getByRole('button', { name: 'Add task' })
+    opener.focus()
+    const dialog = (await openCreateDrawer()) as HTMLElement
+    expect(dialog.getAttribute('role')).toBe('dialog')
+    expect(dialog.getAttribute('aria-modal')).toBe('true')
+    expect(dialog.getAttribute('aria-label')).toBeTruthy()
+    // every field is labelled and tabbable; submit reachable by keyboard
+    const title = within(dialog).getByLabelText(/title/i)
+    title.focus()
+    expect(document.activeElement).toBe(title)
+    // Tab through fields reaches the submit button
+    const submit = within(dialog).getByRole('button', { name: 'Create task' })
+    submit.focus()
+    expect(document.activeElement).toBe(submit)
+    // Escape returns focus to the opener
+    fireEvent.keyDown(document, { key: 'Escape' })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    expect(document.activeElement).toBe(opener)
+  })
+
+  it('project create drawer exposes the same bar', async () => {
+    renderAt('/projects')
+    await screen.findByText('Website redesign')
+    fireEvent.click(screen.getByRole('button', { name: 'New project' }))
+    const dialog = (await screen.findByRole('dialog')) as HTMLElement
+    expect(dialog.getAttribute('aria-modal')).toBe('true')
+    expect(within(dialog).getByLabelText(/name/i)).toBeTruthy()
+    expect(
+      within(dialog).getByRole('button', { name: 'Create project' }),
+    ).toBeTruthy()
+  })
+})
+
 describe('create-pane — "Create form resets on every open" (@w1)', () => {
   beforeEach(() => {
     localStorage.clear()

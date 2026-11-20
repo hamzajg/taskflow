@@ -19,8 +19,10 @@ describe('SRP — "List and board interactions still work after decomposition" (
   it('task form fields are not duplicated between create and edit', () => {
     const page = read('pages/ProjectDetailPage.tsx')
     const item = read('components/TaskItem.tsx')
-    // both surfaces render the shared field set, not hand-rolled Inputs
-    expect(page).toContain('<TaskFormFields')
+    const create = read('pages/TaskCreateDrawer.tsx')
+    // page delegates creation to the drawer; edit and create share the field set
+    expect(page).toContain('TaskCreateDrawer')
+    expect(create).toContain('<TaskFormFields')
     expect(item).toContain('<TaskFormFields')
     expect(item).not.toContain('label="Due date"')
   })

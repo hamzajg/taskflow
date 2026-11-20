@@ -187,9 +187,14 @@ describe('Project detail — "Project detail shows tasks in list view"', () => {
         <App />
       </MemoryRouter>,
     )
-    const titleInput = await screen.findByLabelText(/title/i)
+    // creation lives in the right-side drawer — open it first
+    fireEvent.click(await screen.findByRole('button', { name: 'Add task' }))
+    const dialog = await screen.findByRole('dialog')
+    const titleInput = within(dialog as HTMLElement).getByLabelText(/title/i)
     fireEvent.change(titleInput, { target: { value: 'New task' } })
-    fireEvent.click(screen.getByRole('button', { name: /add task|create task/i }))
+    fireEvent.click(
+      within(dialog as HTMLElement).getByRole('button', { name: 'Create task' }),
+    )
     await waitFor(() =>
       expect(
         fetchMock.mock.calls.some(

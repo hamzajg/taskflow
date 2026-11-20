@@ -154,7 +154,7 @@ describe('Task drawer — "Task title opens the drawer from list view" (@w1)', (
     const dialog = await screen.findByRole('dialog')
     expect(dialog.textContent).toContain('Write copy')
     // project page still mounted behind the overlay
-    expect(screen.getByText('New task')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Add task' })).toBeTruthy()
     // URL carries the drawer state
     expect(loc()).toBe('/projects/5?task=11')
   })

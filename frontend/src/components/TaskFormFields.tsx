@@ -11,6 +11,15 @@ export interface TaskFormValue {
   dueDate: string
 }
 
+export const EMPTY_TASK_FORM: TaskFormValue = {
+  title: '',
+  description: '',
+  status: 'todo',
+  priority: 'medium',
+  assigneeId: '',
+  dueDate: '',
+}
+
 export const STATUS_OPTIONS = TASK_STATUSES.map((s) => ({
   value: s,
   label: statusLabel(s),

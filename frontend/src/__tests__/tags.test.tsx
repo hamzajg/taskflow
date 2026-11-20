@@ -379,3 +379,41 @@ describe('project-tags — "Edit a project and update its tags" (@w2)', () => {
     )
   })
 })
+
+describe('project-tags — "Tag UI works in both themes" (@w3)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('tag controls keep accessible names and pressed state in light and dark', async () => {
+    for (const theme of ['light', 'dark']) {
+      localStorage.setItem('tf-theme', theme)
+      const { unmount } = renderAt('/projects')
+      await screen.findByText('Website redesign')
+
+      // filter chips are labelled buttons with pressed state
+      const all = screen.getByRole('button', { name: 'All' })
+      expect(all.getAttribute('aria-pressed')).toBe('true')
+      const chip = screen.getByRole('button', { name: /Client X/ })
+      expect(chip.getAttribute('aria-pressed')).toBe('false')
+      fireEvent.click(chip)
+      expect(chip.getAttribute('aria-pressed')).toBe('true')
+
+      // management drawer controls are labelled
+      fireEvent.click(screen.getByRole('button', { name: 'Tags', exact: true }))
+      const dialog = await screen.findByRole('dialog')
+      expect(within(dialog).getByLabelText('Tag title')).toBeTruthy()
+      expect(within(dialog).getByLabelText('Rename Client X')).toBeTruthy()
+      expect(
+        within(dialog).getByRole('button', { name: 'Delete Client X' }),
+      ).toBeTruthy()
+      unmount()
+    }
+  })
+})

@@ -1,8 +1,8 @@
 # Delivery Loop — ux-polish
 
-Status: running
+Status: done
 Iterations: 0
-Updated: 2026-11-20T19:06:01Z
+Updated: 2026-11-20T19:17:24Z
 
 | Wave | Status | Branch | PR | Evidence | Updated |
 |------|--------|--------|----|----------|---------|
@@ -25,3 +25,4 @@ Updated: 2026-11-20T19:06:01Z
 - 2026-11-20T19:03:23Z complete wave 2 (#61): frontend 150/150, build clean, evidence verified
 - 2026-11-20T19:04:09Z start wave 3 on feat/ux-polish-w3
 - 2026-11-20T19:06:01Z complete wave 3 (#62): frontend 152/152, build clean, evidence verified
+- 2026-11-20T19:17:24Z feature validated and shipped

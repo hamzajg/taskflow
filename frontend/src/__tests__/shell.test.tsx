@@ -53,7 +53,7 @@ describe('Authenticated pages render inside the app shell', () => {
 
   it('renders sidebar navigation and top bar around page content', async () => {
     const { container } = renderAuthed()
-    expect(await screen.findByText('Welcome, Demo')).toBeTruthy()
+    expect(await screen.findAllByRole('heading', { name: 'Workspaces' })).toBeTruthy()
     expect(container.querySelector('.sidebar')).toBeTruthy()
     expect(container.querySelector('.topbar')).toBeTruthy()
     expect(screen.getAllByText('Dashboard').length).toBeGreaterThan(0)
@@ -63,15 +63,15 @@ describe('Authenticated pages render inside the app shell', () => {
 
   it('Existing flows still work inside the shell', async () => {
     renderAuthed()
-    expect(await screen.findByText('Welcome, Demo')).toBeTruthy()
+    expect(await screen.findAllByRole('heading', { name: 'Workspaces' })).toBeTruthy()
     expect(screen.getAllByText('Workspaces').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Profile').length).toBeGreaterThan(0)
-    expect(screen.getByText('Save profile')).toBeTruthy()
+    expect(screen.getByRole('link', { name: /profile/i }).getAttribute('href')).toBe('/profile')
   })
 
   it('collapse control toggles the mobile drawer state', async () => {
     const { container } = renderAuthed()
-    await screen.findByText('Welcome, Demo')
+    await screen.findAllByRole('heading', { name: 'Workspaces' })
     const toggle = screen.getByLabelText('Open navigation')
     expect(toggle.getAttribute('aria-expanded')).toBe('false')
     fireEvent.click(toggle)
@@ -95,7 +95,7 @@ describe('Keyboard and assistive technology support', () => {
 
   it('every button exposes an accessible name', async () => {
     const { container } = renderAuthed()
-    await screen.findByText('Welcome, Demo')
+    await screen.findAllByRole('heading', { name: 'Workspaces' })
     const buttons = Array.from(container.querySelectorAll('button'))
     expect(buttons.length).toBeGreaterThan(0)
     for (const btn of buttons) {
@@ -109,7 +109,7 @@ describe('Keyboard and assistive technology support', () => {
 
   it('skip link targets the main content landmark', async () => {
     const { container } = renderAuthed()
-    await screen.findByText('Welcome, Demo')
+    await screen.findAllByRole('heading', { name: 'Workspaces' })
     const skip = container.querySelector('.skip-link') as HTMLAnchorElement
     expect(skip).toBeTruthy()
     expect(skip.getAttribute('href')).toBe('#main')

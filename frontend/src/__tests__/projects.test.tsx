@@ -132,7 +132,7 @@ describe('Projects list — "Projects list shows workspace projects with counts"
 
   it('exposes a Projects entry in the sidebar navigation', async () => {
     renderAt('/account')
-    await screen.findByText('Welcome, Demo')
+    await screen.findAllByRole('heading', { name: 'Workspaces' })
     const nav = screen.getAllByRole('link', { name: /Projects/ })
     expect(nav.length).toBeGreaterThan(0)
     expect(nav[0].getAttribute('href')).toBe('/projects')

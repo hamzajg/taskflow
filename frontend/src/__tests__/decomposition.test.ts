@@ -52,12 +52,18 @@ describe('SRP — "CommentThread is shared, not duplicated" (@w2)', () => {
   })
 })
 
-describe('SRP — "AccountPage delegates profile editing to ProfileForm" (@w3)', () => {
-  it('AccountPage contains no form markup or profile submit logic', () => {
-    const page = read('pages/AccountPage.tsx')
+describe('SRP — "ProfilePage delegates profile editing to ProfileForm" (@w3)', () => {
+  it('ProfilePage contains no form markup or profile submit logic', () => {
+    const page = read('pages/ProfilePage.tsx')
     expect(page).not.toContain('<form')
     expect(page).not.toContain('api.put')
     expect(page).toContain('components/ProfileForm')
+  })
+
+  it('AccountPage no longer hosts the profile form', () => {
+    const page = read('pages/AccountPage.tsx')
+    expect(page).not.toContain('ProfileForm')
+    expect(page).not.toContain('<form')
   })
 
   it('ProfileForm owns fields, submit, pending state and messages', () => {

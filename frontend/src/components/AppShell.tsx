@@ -12,14 +12,13 @@ interface NavEntry {
   label: string
   icon: ReactNode
   to: string
-  hash?: string
 }
 
 const NAV: NavEntry[] = [
   { label: 'Dashboard', icon: <LayoutDashboard size={18} />, to: '/dashboard' },
   { label: 'Projects', icon: <ListTodo size={18} />, to: '/projects' },
-  { label: 'Workspaces', icon: <FolderKanban size={18} />, to: '/account', hash: '#workspaces' },
-  { label: 'Profile', icon: <UserIcon size={18} />, to: '/account', hash: '#profile' },
+  { label: 'Workspaces', icon: <FolderKanban size={18} />, to: '/account' },
+  { label: 'Profile', icon: <UserIcon size={18} />, to: '/profile' },
 ]
 
 export default function AppShell() {
@@ -91,8 +90,8 @@ export default function AppShell() {
           {NAV.map((item) => (
             <NavLink
               key={item.label}
-              to={{ pathname: item.to, hash: item.hash }}
-              end={!item.hash}
+              to={item.to}
+              end={item.to !== '/account'}
               className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
               onClick={() => setNavOpen(false)}
             >

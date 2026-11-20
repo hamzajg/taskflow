@@ -2,8 +2,16 @@
   "feature": "profile-page",
   "status": "running",
   "iterations": 0,
-  "updated": "2026-11-20T10:05:40Z",
-  "waves": {},
+  "updated": "2026-11-20T10:31:39Z",
+  "waves": {
+    "1": {
+      "status": "done",
+      "branch": "feat/profile-page-w1",
+      "pr": "#46",
+      "evidence": "vitest 113/113, build clean, evidence 20261120T103041Z-a31492b verified",
+      "updated": "2026-11-20T10:31:39Z"
+    }
+  },
   "gates": {
     "G1": {
       "status": "met",
@@ -12,6 +20,8 @@
     }
   },
   "events": [
-    "2026-11-20T10:05:40Z gate G1 met: specs/profile-page/DECISION-REVIEW.md (challenger REVISE \u2192 all 5 findings folded; post-fold ACCEPT)"
+    "2026-11-20T10:05:40Z gate G1 met: specs/profile-page/DECISION-REVIEW.md (challenger REVISE \u2192 all 5 findings folded; post-fold ACCEPT)",
+    "2026-11-20T10:28:10Z start wave 1 on feat/profile-page-w1",
+    "2026-11-20T10:31:39Z complete wave 1 (#46): vitest 113/113, build clean, evidence 20261120T103041Z-a31492b verified"
   ]
 }

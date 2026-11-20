@@ -9,6 +9,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage'
 import LandingPage from './pages/LandingPage'
 import DashboardPage from './pages/DashboardPage'
 import AccountPage from './pages/AccountPage'
+import ProfilePage from './pages/ProfilePage'
 import ProjectsPage from './pages/ProjectsPage'
 import ProjectDetailPage from './pages/ProjectDetailPage'
 import TaskDetailPage from './pages/TaskDetailPage'
@@ -41,6 +42,7 @@ export default function App() {
       >
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="account" element={<AccountPage />} />
+        <Route path="profile" element={<ProfilePage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="projects/:id" element={<ProjectDetailPage />} />
         <Route path="tasks/:id" element={<TaskDetailPage />} />

@@ -2,14 +2,14 @@
   "feature": "task-drawer",
   "status": "running",
   "iterations": 0,
-  "updated": "2026-11-20T06:04:26Z",
+  "updated": "2026-11-20T06:10:06Z",
   "waves": {
     "1": {
-      "status": "in-progress",
+      "status": "done",
       "branch": "feat/task-drawer-w1",
-      "pr": "\u2014",
-      "evidence": "\u2014",
-      "updated": "2026-11-20T06:04:26Z"
+      "pr": "#28",
+      "evidence": "Drawer+TaskDrawer+CommentThread+?task= URL state; vitest 59/59, build clean, evidence 20261120T060737Z-3ad1e22 verified",
+      "updated": "2026-11-20T06:10:06Z"
     }
   },
   "gates": {
@@ -21,6 +21,7 @@
   },
   "events": [
     "2026-11-20T06:04:25Z gate G1 met: specs/task-drawer/DECISION-REVIEW.md \u2014 challenger REVISE, all 9 findings folded into SPEC/EXAMPLES/BACKLOG",
-    "2026-11-20T06:04:26Z start wave 1 on feat/task-drawer-w1"
+    "2026-11-20T06:04:26Z start wave 1 on feat/task-drawer-w1",
+    "2026-11-20T06:10:06Z complete wave 1 (#28): Drawer+TaskDrawer+CommentThread+?task= URL state; vitest 59/59, build clean, evidence 20261120T060737Z-3ad1e22 verified"
   ]
 }

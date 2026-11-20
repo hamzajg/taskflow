@@ -12,8 +12,11 @@ import {
 import TaskItem from '../components/TaskItem'
 import ViewToggle from '../components/ViewToggle'
 import BoardView from './BoardView'
+import ProjectCreateDrawer from './ProjectCreateDrawer'
+import TagBadges from '../components/TagBadges'
 import TaskCreateDrawer from './TaskCreateDrawer'
 import TaskDrawer from './TaskDrawer'
+import { useShell } from '../shell/ShellContext'
 import {
   MemberDto,
   ProjectDto,
@@ -34,6 +37,7 @@ function formFromTask(t: TaskDto): TaskFormValue {
 }
 
 export default function ProjectDetailPage() {
+  const { workspaces } = useShell()
   const { id } = useParams<{ id: string }>()
   const projectId = Number(id)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -51,6 +55,7 @@ export default function ProjectDetailPage() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editForm, setEditForm] = useState<TaskFormValue>(EMPTY_TASK_FORM)
   const [createOpen, setCreateOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
   const [view, setView] = useState<'list' | 'board'>(() =>
     localStorage.getItem(`taskflow.view.${projectId}`) === 'board'
       ? 'board'
@@ -189,11 +194,25 @@ export default function ProjectDetailPage() {
     <>
       <PageHeader
         title={project.name}
-        description={project.description}
+        description={
+          <>
+            {project.description}
+            <TagBadges tags={project.tags} />
+          </>
+        }
         actions={
-          <Link to="/projects" className="muted">
-            ← Projects
-          </Link>
+          <>
+            {['owner', 'admin'].includes(
+              workspaces.find((w) => w.id === project.workspaceId)?.role ?? '',
+            ) && (
+              <Button size="sm" variant="secondary" onClick={() => setEditOpen(true)}>
+                Edit project
+              </Button>
+            )}
+            <Link to="/projects" className="muted">
+              ← Projects
+            </Link>
+          </>
         }
       />
 
@@ -259,6 +278,14 @@ export default function ProjectDetailPage() {
         taskId={drawerTaskId}
         open={drawerTaskId !== null}
         onClose={closeTaskDrawer}
+      />
+      <ProjectCreateDrawer
+        open={editOpen}
+        workspaceId={project.workspaceId}
+        project={project}
+        onClose={() => setEditOpen(false)}
+        onCreated={() => {}}
+        onUpdated={load}
       />
       <TaskCreateDrawer
         open={createOpen}

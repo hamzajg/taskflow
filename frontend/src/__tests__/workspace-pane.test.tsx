@@ -53,6 +53,19 @@ function mockApi(opts: MockOpts = {}, calls: string[] = []) {
       calls.push(`${method} ${url}`)
       if (url === '/workspaces/1/members' && opts.membersFail)
         return Promise.resolve(jsonResponse({ message: 'members boom' }, 500))
+      if (method === 'POST' && url === '/workspaces') {
+        if (opts.postFail)
+          return Promise.resolve(jsonResponse({ message: 'workspace rejected' }, 400))
+        const body = JSON.parse(String(init.body))
+        const created = {
+          id: 3,
+          name: body.name,
+          role: 'owner',
+          memberCount: 1,
+        }
+        workspaces = [...workspaces, created]
+        return Promise.resolve(jsonResponse(created, 201))
+      }
       if (method === 'POST' && url === '/workspaces/1/invites')
         return Promise.resolve(
           opts.postFail
@@ -295,6 +308,108 @@ describe('workspace-pane — "Members load failure alerts with retry inside the 
     const alert = await within(dialog).findByRole('alert')
     expect(alert.textContent).toContain('members boom')
     expect(within(dialog).getByRole('button', { name: /retry/i })).toBeTruthy()
+  })
+})
+
+describe('workspace-pane — "New workspace opens the creation drawer" (@w2)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('opens a labelled dialog with the workspace name field', async () => {
+    renderAt()
+    await screen.findByRole('button', { name: 'Acme' })
+    fireEvent.click(screen.getByRole('button', { name: 'New workspace' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog as HTMLElement).getByLabelText(/workspace name|name/i)).toBeTruthy()
+    expect(
+      within(dialog as HTMLElement).getByRole('button', { name: 'Create workspace' }),
+    ).toBeTruthy()
+  })
+})
+
+describe('workspace-pane — "Creating a workspace closes the drawer and updates the list" (@w2)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('posts the workspace, closes and refreshes the list', async () => {
+    const calls: string[] = []
+    mockApi({}, calls)
+    renderAt()
+    await screen.findByRole('button', { name: 'Acme' })
+    fireEvent.click(screen.getByRole('button', { name: 'New workspace' }))
+    const dialog = (await screen.findByRole('dialog')) as HTMLElement
+    fireEvent.change(within(dialog).getByLabelText(/name/i), {
+      target: { value: 'Gamma' },
+    })
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: 'Create workspace' }),
+    )
+    await waitFor(() =>
+      expect(calls.some((c) => c === 'POST /workspaces')).toBe(true),
+    )
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+})
+
+describe('workspace-pane — "Workspace create errors stay inside the drawer" (@w2)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi({ postFail: true })
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('alerts inside the drawer and preserves the entered name', async () => {
+    renderAt()
+    await screen.findByRole('button', { name: 'Acme' })
+    fireEvent.click(screen.getByRole('button', { name: 'New workspace' }))
+    const dialog = (await screen.findByRole('dialog')) as HTMLElement
+    fireEvent.change(within(dialog).getByLabelText(/name/i), {
+      target: { value: 'Gamma' },
+    })
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: 'Create workspace' }),
+    )
+    const alert = await within(dialog).findByRole('alert')
+    expect(alert.textContent).toContain('workspace rejected')
+    expect(within(dialog).getByLabelText(/name/i)).toHaveProperty('value', 'Gamma')
+  })
+})
+
+describe('workspace-pane — "Account page shows no inline workspace forms" (@w2)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('no inline create form or subpanel remains on the account page', async () => {
+    const { container } = renderAt()
+    await screen.findByRole('button', { name: 'Acme' })
+    expect(container.querySelector('form.inline-form')).toBeNull()
+    expect(document.querySelector('.subpanel')).toBeNull()
+    expect(screen.queryByLabelText(/new workspace/i)).toBeNull()
   })
 })
 

@@ -1,11 +1,9 @@
-import { FormEvent, useState } from 'react'
-import { api, ApiError } from '../api'
-import Alert from '../components/Alert'
+import { useState } from 'react'
 import Badge from '../components/Badge'
 import Button from '../components/Button'
 import Card from '../components/Card'
-import Input from '../components/Input'
 import { useShell } from '../shell/ShellContext'
+import WorkspaceCreateDrawer from './WorkspaceCreateDrawer'
 import WorkspaceDrawer from './WorkspaceDrawer'
 import { WorkspaceDto } from './workspaceTypes'
 
@@ -22,38 +20,20 @@ export default function WorkspacePanel({
   workspaces: WorkspaceDto[]
   onChanged: () => void
 }) {
-  const [name, setName] = useState('')
-  const [error, setError] = useState('')
   const [openId, setOpenId] = useState<number | null>(null)
+  const [createOpen, setCreateOpen] = useState(false)
   const { setActiveWorkspaceId } = useShell()
   const openWs = workspaces.find((w) => w.id === openId)
 
-  async function create(e: FormEvent) {
-    e.preventDefault()
-    setError('')
-    try {
-      await api.post('/workspaces', { name })
-      setName('')
-      onChanged()
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Create failed')
-    }
-  }
-
   return (
-    <Card title="Workspaces">
-      {error && <Alert>{error}</Alert>}
-      <form className="inline-form" onSubmit={create}>
-        <Input
-          label="New workspace"
-          placeholder="Workspace name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <Button type="submit">Create</Button>
-      </form>
-
+    <Card
+      title="Workspaces"
+      actions={
+        <Button size="sm" onClick={() => setCreateOpen(true)}>
+          New workspace
+        </Button>
+      }
+    >
       <ul className="ws-list">
         {workspaces.map((w) => (
           <li key={w.id}>
@@ -82,6 +62,11 @@ export default function WorkspacePanel({
           onChanged={onChanged}
         />
       )}
+      <WorkspaceCreateDrawer
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreated={onChanged}
+      />
     </Card>
   )
 }

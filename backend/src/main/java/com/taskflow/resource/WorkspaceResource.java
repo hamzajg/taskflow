@@ -1,6 +1,7 @@
 package com.taskflow.resource;
 
 import com.taskflow.dto.AuthDtos.*;
+import com.taskflow.dto.AuthDtos.WorkspaceSummaryDto;
 import com.taskflow.model.User;
 import com.taskflow.security.SessionClaims;
 import com.taskflow.service.AuthService;
@@ -12,6 +13,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 
@@ -75,6 +77,13 @@ public class WorkspaceResource {
     public Response delete(@PathParam("id") Long id) {
         workspaceService.delete(currentUser(), id);
         return Response.noContent().build();
+    }
+
+    @GET
+    @Path("/{id}/summary")
+    @Operation(summary = "Workspace dashboard summary (counts by status, overdue, due soon, my open tasks)")
+    public WorkspaceSummaryDto summary(@PathParam("id") Long id) {
+        return workspaceService.summary(currentUser(), id);
     }
 
     @GET

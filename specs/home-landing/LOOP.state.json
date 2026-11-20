@@ -2,7 +2,7 @@
   "feature": "home-landing",
   "status": "running",
   "iterations": 0,
-  "updated": "2026-11-20T05:17:10Z",
+  "updated": "2026-11-20T05:34:03Z",
   "waves": {
     "1": {
       "status": "done",
@@ -10,6 +10,13 @@
       "pr": "#24",
       "evidence": "vitest 40/40, build clean, 4 playwright screenshots; evidence 20261120T051645Z-cd563fb",
       "updated": "2026-11-20T05:17:10Z"
+    },
+    "2": {
+      "status": "in-progress",
+      "branch": "feat/home-landing-w2",
+      "pr": "\u2014",
+      "evidence": "\u2014",
+      "updated": "2026-11-20T05:34:03Z"
     }
   },
   "gates": {
@@ -22,6 +29,7 @@
   "events": [
     "2026-11-20T05:10:36Z gate G1 met: specs/home-landing/DECISION-REVIEW.md (verdict REVISE, all findings folded into SPEC.md; spec audit PASS)",
     "2026-11-20T05:10:36Z start wave 1 on feat/home-landing-w1",
-    "2026-11-20T05:17:10Z complete wave 1 (#24): vitest 40/40, build clean, 4 playwright screenshots; evidence 20261120T051645Z-cd563fb"
+    "2026-11-20T05:17:10Z complete wave 1 (#24): vitest 40/40, build clean, 4 playwright screenshots; evidence 20261120T051645Z-cd563fb",
+    "2026-11-20T05:34:03Z start wave 2 on feat/home-landing-w2"
   ]
 }

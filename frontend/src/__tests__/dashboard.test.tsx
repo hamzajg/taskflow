@@ -136,7 +136,7 @@ describe('Dashboard — "Dashboard shows workspace stat cards"', () => {
     expect(link.getAttribute('href')).toBe('/projects/5')
   })
 
-  it('shows an empty state when the workspace has no projects', async () => {
+  it('Dashboard handles empty and loading states — shows an empty state when the workspace has no projects', async () => {
     mockApi({
       workspaces: [{ id: 1, name: 'Empty', role: 'owner', memberCount: 1 }],
     })
@@ -174,7 +174,7 @@ describe('Dashboard — "Dashboard shows workspace stat cards"', () => {
     expect(document.querySelectorAll('.stat-card').length).toBe(9)
   })
 
-  it('shows an error with retry when the summary request fails', async () => {
+  it('Dashboard error offers retry — shows an error with retry when the summary request fails', async () => {
     mockApi({ workspaces: [WORKSPACES[0]], failSummary: true })
     renderAt('/dashboard')
     const alert = await screen.findByRole('alert')

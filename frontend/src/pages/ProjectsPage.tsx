@@ -6,6 +6,7 @@ import Badge from '../components/Badge'
 import Button from '../components/Button'
 import Card from '../components/Card'
 import Input from '../components/Input'
+import PageHeader from '../components/PageHeader'
 import { useShell } from '../shell/ShellContext'
 import { ProjectDto } from './projectTypes'
 
@@ -61,7 +62,7 @@ export default function ProjectsPage() {
 
   return (
     <>
-      <h1>Projects</h1>
+      <PageHeader title="Projects" />
       {workspaceId === null ? (
         <Card>
           <p className="muted">

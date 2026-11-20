@@ -5,6 +5,7 @@ import Alert from '../components/Alert'
 import Button from '../components/Button'
 import Card from '../components/Card'
 import Input from '../components/Input'
+import PageHeader from '../components/PageHeader'
 import { useShell } from '../shell/ShellContext'
 import WorkspacePanel from './WorkspacePanel'
 
@@ -35,7 +36,7 @@ export default function AccountPage() {
 
   return (
     <>
-      <h1>Welcome{user ? `, ${user.firstName}` : ''}</h1>
+      <PageHeader title={`Welcome${user ? `, ${user.firstName}` : ''}`} />
       {!user?.verified && (
         <Alert tone="warning">Please verify your email to use workspace features.</Alert>
       )}

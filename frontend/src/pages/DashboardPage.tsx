@@ -10,6 +10,7 @@ import { api, ApiError } from '../api'
 import Alert from '../components/Alert'
 import Button from '../components/Button'
 import Card from '../components/Card'
+import PageHeader from '../components/PageHeader'
 import StatCard from '../components/StatCard'
 import { useShell } from '../shell/ShellContext'
 import { ProjectDto, statusLabel } from './projectTypes'
@@ -70,7 +71,7 @@ export default function DashboardPage() {
   if (workspaceId === null) {
     return (
       <>
-        <h1>Dashboard</h1>
+        <PageHeader title="Dashboard" />
         <Card title="No workspace yet">
           <p className="muted">
             {workspaces.length === 0
@@ -91,11 +92,12 @@ export default function DashboardPage() {
 
   return (
     <>
-      <h1>Dashboard</h1>
-      <p className="muted">
-        Welcome back{user ? `, ${user.firstName}` : ''} — here's{' '}
-        {workspaces.find((w) => w.id === workspaceId)?.name ?? 'your workspace'}.
-      </p>
+      <PageHeader
+        title="Dashboard"
+        description={`Welcome back${user ? `, ${user.firstName}` : ''} — here's ${
+          workspaces.find((w) => w.id === workspaceId)?.name ?? 'your workspace'
+        }.`}
+      />
 
       {summaryError ? (
         <Alert>

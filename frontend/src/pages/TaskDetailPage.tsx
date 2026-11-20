@@ -6,6 +6,7 @@ import Alert from '../components/Alert'
 import Badge from '../components/Badge'
 import Button from '../components/Button'
 import Card from '../components/Card'
+import PageHeader from '../components/PageHeader'
 import {
   CommentDto,
   priorityTone,
@@ -126,13 +127,16 @@ export default function TaskDetailPage() {
 
   return (
     <div className="task-detail">
-      <p>
-        <Link to={`/projects/${task.projectId}`}>
-          ← {project?.name ?? 'Back to project'}
-        </Link>
-      </p>
+      <PageHeader
+        title={task.title}
+        actions={
+          <Link to={`/projects/${task.projectId}`} className="muted">
+            ← {project?.name ?? 'Back to project'}
+          </Link>
+        }
+      />
 
-      <Card title={task.title}>
+      <Card>
         {task.description && <p>{task.description}</p>}
         <dl className="task-fields">
           <div>

@@ -6,6 +6,7 @@ import Badge from '../components/Badge'
 import Button from '../components/Button'
 import Card from '../components/Card'
 import Input from '../components/Input'
+import PageHeader from '../components/PageHeader'
 import Select from '../components/Select'
 import BoardView from './BoardView'
 import {
@@ -206,11 +207,15 @@ export default function ProjectDetailPage() {
 
   return (
     <>
-      <p>
-        <Link to="/projects">← Projects</Link>
-      </p>
-      <h1>{project.name}</h1>
-      {project.description && <p className="muted">{project.description}</p>}
+      <PageHeader
+        title={project.name}
+        description={project.description}
+        actions={
+          <Link to="/projects" className="muted">
+            ← Projects
+          </Link>
+        }
+      />
 
       <Card title="New task">
         {formError && <Alert>{formError}</Alert>}

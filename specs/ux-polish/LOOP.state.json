@@ -1,0 +1,27 @@
+{
+  "feature": "ux-polish",
+  "status": "running",
+  "iterations": 0,
+  "updated": "2026-11-20T18:37:46Z",
+  "waves": {
+    "1": {
+      "status": "done",
+      "branch": "feat/ux-polish-w1",
+      "pr": "#60",
+      "evidence": "backend 65/65, WorkspaceSummaryTest 5/5, evidence verified",
+      "updated": "2026-11-20T18:37:46Z"
+    }
+  },
+  "gates": {
+    "G1": {
+      "status": "met",
+      "evidence": "specs/ux-polish/DECISION-REVIEW.md",
+      "updated": "2026-11-20T18:34:13Z"
+    }
+  },
+  "events": [
+    "2026-11-20T18:34:13Z gate G1 met: specs/ux-polish/DECISION-REVIEW.md",
+    "2026-11-20T18:34:13Z start wave 1 on feat/ux-polish-w1",
+    "2026-11-20T18:37:46Z complete wave 1 (#60): backend 65/65, WorkspaceSummaryTest 5/5, evidence verified"
+  ]
+}

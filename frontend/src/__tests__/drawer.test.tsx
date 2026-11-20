@@ -265,6 +265,84 @@ describe('Task drawer — "Drawer dismisses via escape, overlay and close button
   })
 })
 
+describe('Task drawer — "Task links keep native navigation semantics" (@w1)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('keeps href and only intercepts plain clicks', async () => {
+    renderAt('/projects')
+    await openListView()
+    const link = screen.getByRole('link', { name: 'Write copy' })
+    expect(link.getAttribute('href')).toBe('/tasks/11')
+    // ctrl+click must NOT open the drawer — native navigation semantics
+    fireEvent.click(link, { ctrlKey: true })
+    expect(screen.queryByRole('dialog')).toBeNull()
+    fireEvent.click(link, { metaKey: true })
+    expect(screen.queryByRole('dialog')).toBeNull()
+    // plain click opens it
+    fireEvent.click(link)
+    expect(await screen.findByRole('dialog')).toBeTruthy()
+  })
+})
+
+describe('Task drawer — "Board drag-and-drop still works" (@w1)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('board cards keep href links and the Move control', async () => {
+    renderAt('/projects')
+    await openListView()
+    fireEvent.click(screen.getByRole('button', { name: 'Board' }))
+    const link = await screen.findByRole('link', { name: 'Write copy' })
+    expect(link.getAttribute('href')).toBe('/tasks/11')
+    // keyboard-accessible move path still present on every card
+    const moveButtons = screen.getAllByRole('button', { name: 'Move' })
+    expect(moveButtons.length).toBeGreaterThan(0)
+    // card is still a drag source
+    const card = link.closest('.board-card') as HTMLElement
+    expect(card.getAttribute('draggable')).toBe('true')
+  })
+})
+
+describe('Task drawer — "Detail page still works standalone" (@w1)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('direct /tasks/:id visit renders fields and comments without a drawer', async () => {
+    renderAt('/tasks/11')
+    expect(await screen.findByText('First pass done')).toBeTruthy()
+    expect(screen.getByText('Hero + pricing page copy')).toBeTruthy()
+    expect(screen.queryByRole('dialog')).toBeNull()
+    // shared thread: posting works on the standalone page too
+    fireEvent.change(screen.getByLabelText(/add a comment/i), {
+      target: { value: 'Standalone comment' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /post comment/i }))
+    expect(await screen.findByText('Standalone comment')).toBeTruthy()
+  })
+})
+
 describe('Task drawer — "Open full page reaches the canonical detail view" (@w1)', () => {
   beforeEach(() => {
     localStorage.clear()

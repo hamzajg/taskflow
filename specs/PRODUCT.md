@@ -6,6 +6,7 @@
 | home-landing (`home-landing/`) | 3 | 12 | 3 | yes | yes |
 | projects-tasks (`projects-tasks/`) | 4 | 15 | 4 | yes | yes |
 | task-detail (`task-detail/`) | 3 | 12 | 3 | yes | yes |
+| task-drawer (`task-drawer/`) | 3 | 13 | 3 | yes | yes |
 | workspaces-accounts (`workspaces-accounts/`) | 6 | 12 | 4 | yes | yes |
 
 

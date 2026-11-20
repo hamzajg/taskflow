@@ -99,6 +99,9 @@ function mockApi(state: MockState = { comments: [...COMMENTS] }) {
         state.comments = [...state.comments, created]
         return Promise.resolve(jsonResponse(created, 201))
       }
+      if (url === '/tasks/11/time-entries') {
+        return Promise.resolve(jsonResponse({ entries: [], running: null }))
+      }
       const patchMatch = url.match(/^\/comments\/(\d+)$/)
       if (patchMatch && method === 'PATCH') {
         const body = JSON.parse(String(init?.body)) as { body: string }
@@ -249,6 +252,9 @@ describe('Task detail — "Loading and error states are handled"', () => {
         if (url === '/projects/5') return Promise.resolve(jsonResponse(PROJECT))
         if (url === '/tasks/11/comments') {
           return Promise.resolve(jsonResponse({ comments: [], hasMore: false }))
+        }
+        if (url === '/tasks/11/time-entries') {
+          return Promise.resolve(jsonResponse({ entries: [], running: null }))
         }
         if (url === '/auth/me') return Promise.resolve(jsonResponse(USER))
         if (url === '/workspaces') return Promise.resolve(jsonResponse([WORKSPACE]))

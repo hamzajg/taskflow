@@ -102,6 +102,7 @@ function mockApi() {
     ],
     '/tasks/11': { ...TASKS[0], projectName: 'Website redesign' },
     '/tasks/11/comments': { comments: COMMENTS, hasMore: false },
+    '/tasks/11/time-entries': { entries: [], running: null },
   }
   vi.stubGlobal(
     'fetch',

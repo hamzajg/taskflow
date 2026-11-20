@@ -1,8 +1,8 @@
 # Delivery Loop — home-landing
 
-Status: running
+Status: done
 Iterations: 1
-Updated: 2026-11-20T05:47:38Z
+Updated: 2026-11-20T05:55:29Z
 
 | Wave | Status | Branch | PR | Evidence | Updated |
 |------|--------|--------|----|----------|---------|
@@ -25,3 +25,4 @@ Updated: 2026-11-20T05:47:38Z
 - 2026-11-20T05:40:03Z complete wave 2 (#25): summary API + dashboard widgets; backend mvn green, vitest 44/44, build clean, evidence 20261120T053807Z-ff7b93e verifie
 - 2026-11-20T05:45:51Z start wave 3 on feat/home-landing-w3
 - 2026-11-20T05:47:38Z complete wave 3 (#26): PageHeader reskin + focus fix; vitest 50/50, build clean, evidence 20261120T054709Z-ab9a7d5 verified
+- 2026-11-20T05:55:29Z feature validated and shipped

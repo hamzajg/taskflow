@@ -2,7 +2,7 @@
   "feature": "action-a11y",
   "status": "running",
   "iterations": 0,
-  "updated": "2026-11-20T13:16:22Z",
+  "updated": "2026-11-20T13:21:44Z",
   "waves": {
     "1": {
       "status": "done",
@@ -12,11 +12,11 @@
       "updated": "2026-11-20T13:07:49Z"
     },
     "2": {
-      "status": "in-progress",
+      "status": "done",
       "branch": "feat/action-a11y-w2",
       "pr": "\u2014",
-      "evidence": "\u2014",
-      "updated": "2026-11-20T13:16:22Z"
+      "evidence": "vitest 123/123 + build clean; evidence 20261120T131711Z-81d8b2c verified; live DOM check: Remove Mem Ber label",
+      "updated": "2026-11-20T13:21:44Z"
     }
   },
   "gates": {
@@ -30,6 +30,7 @@
     "2026-11-20T13:00:00Z gate G1 met: specs/action-a11y/DECISION-REVIEW.md (REVISE \u2192 findings folded; spec audit PASS post-fold)",
     "2026-11-20T13:07:49Z start wave 1 on feat/action-a11y-w1",
     "2026-11-20T13:07:49Z complete wave 1 (#49): vitest 120/120, build clean, live-verified aria-labels in DOM, evidence 20261120T130639Z-4992b03 verified",
-    "2026-11-20T13:16:22Z start wave 2 on feat/action-a11y-w2"
+    "2026-11-20T13:16:22Z start wave 2 on feat/action-a11y-w2",
+    "2026-11-20T13:21:44Z complete wave 2: vitest 123/123 + build clean; evidence 20261120T131711Z-81d8b2c verified; live DOM check: Remove Mem Ber label"
   ]
 }

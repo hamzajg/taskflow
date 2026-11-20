@@ -1,8 +1,8 @@
 # Delivery Loop — time-tracking
 
-Status: running
+Status: done
 Iterations: 0
-Updated: 2026-11-20T17:10:26Z
+Updated: 2026-11-20T17:16:15Z
 
 | Wave | Status | Branch | PR | Evidence | Updated |
 |------|--------|--------|----|----------|---------|
@@ -26,3 +26,4 @@ Updated: 2026-11-20T17:10:26Z
 - 2026-11-20T17:05:48Z start wave 3 on feat/time-tracking-w3
 - 2026-11-20T17:10:05Z complete wave 3 (0): placeholder
 - 2026-11-20T17:10:26Z complete wave 3 (58): correcting PR ref (was recorded as 0)
+- 2026-11-20T17:16:15Z feature validated and shipped

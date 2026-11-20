@@ -1,8 +1,8 @@
 {
   "feature": "time-tracking",
-  "status": "running",
+  "status": "done",
   "iterations": 0,
-  "updated": "2026-11-20T17:10:26Z",
+  "updated": "2026-11-20T17:16:15Z",
   "waves": {
     "1": {
       "status": "done",
@@ -41,6 +41,7 @@
     "2026-11-20T16:52:58Z complete wave 2 (57): frontend 136/136; build clean; evidence 20261120T165147Z-f49193b verified with 3 screenshots",
     "2026-11-20T17:05:48Z start wave 3 on feat/time-tracking-w3",
     "2026-11-20T17:10:05Z complete wave 3 (0): placeholder",
-    "2026-11-20T17:10:26Z complete wave 3 (58): correcting PR ref (was recorded as 0)"
+    "2026-11-20T17:10:26Z complete wave 3 (58): correcting PR ref (was recorded as 0)",
+    "2026-11-20T17:16:15Z feature validated and shipped"
   ]
 }

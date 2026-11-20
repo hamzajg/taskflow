@@ -136,7 +136,7 @@ public class TagService {
         List<Object[]> rows = Tag.getEntityManager().createNativeQuery(
                         "select pt.project_id, t.id, t.title, t.color"
                                 + " from project_tags pt join tags t on t.id = pt.tag_id"
-                                + " where pt.project_id in (:ids) order by t.title")
+                                + " where pt.project_id in (:ids) order by lower(t.title)")
                 .setParameter("ids", projectIds)
                 .getResultList();
         for (Object[] row : rows) {

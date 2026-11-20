@@ -43,11 +43,12 @@ workspace, labels projects, and the team filters by tag.
   `PUT/DELETE /workspaces/{wid}/tags/{tagId}`; project create/update
   requests accept `tagIds` and `ProjectDto` returns `tags`. Deleting a tag
   detaches it from all projects; deleting a project removes its assignments.
-- Authorization: any workspace member can list tags, view badges, and
-  filter. Tag create/rename/recolor/delete and project tag assignment
-  (via project create/update) require owner/admin — identical to the
-  existing project-mutation rule; members get 403 on tag mutation and on
-  project edits that carry `tagIds`.
+- Authorization: any workspace member can list tags, view badges, filter,
+  and assign tags **at project-create time** (project create itself only
+  requires membership). Tag create/rename/recolor/delete and project tag
+  assignment **via update** require owner/admin — each assignment path
+  inherits the authz of the operation carrying it; members get 403 on tag
+  mutation and on project edits that carry `tagIds`.
 - Frontend: tag badges on project cards and the project detail header;
   tag multi-select inside the project drawer; a tag management surface
   (list + create + rename/recolor + delete) reachable from `/projects`;

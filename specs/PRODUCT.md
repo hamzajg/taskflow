@@ -8,6 +8,7 @@
 | default-workspace (`default-workspace/`) | 2 | 11 | 2 | yes | yes |
 | home-landing (`home-landing/`) | 3 | 12 | 3 | yes | yes |
 | profile-page (`profile-page/`) | 2 | 8 | 2 | yes | yes |
+| project-tags (`project-tags/`) | 3 | 15 | 3 | yes | yes |
 | projects-tasks (`projects-tasks/`) | 4 | 15 | 4 | yes | yes |
 | task-detail (`task-detail/`) | 3 | 12 | 3 | yes | yes |
 | task-drawer (`task-drawer/`) | 3 | 13 | 3 | yes | yes |

@@ -1,5 +1,5 @@
-import { FormEvent, useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { FormEvent, MouseEvent, useCallback, useEffect, useState } from 'react'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { api, ApiError } from '../api'
 import Alert from '../components/Alert'
 import Badge from '../components/Badge'
@@ -9,6 +9,7 @@ import Input from '../components/Input'
 import PageHeader from '../components/PageHeader'
 import Select from '../components/Select'
 import BoardView from './BoardView'
+import TaskDrawer from './TaskDrawer'
 import {
   MemberDto,
   priorityTone,
@@ -51,6 +52,10 @@ function formFromTask(t: TaskDto): TaskForm {
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
   const projectId = Number(id)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const taskParam = searchParams.get('task')
+  const drawerTaskId =
+    taskParam !== null && /^\d+$/.test(taskParam) ? Number(taskParam) : null
 
   const [project, setProject] = useState<ProjectDto | null>(null)
   const [tasks, setTasks] = useState<TaskDto[] | null>(null)
@@ -72,6 +77,25 @@ export default function ProjectDetailPage() {
   function switchView(next: 'list' | 'board') {
     setView(next)
     localStorage.setItem(`taskflow.view.${projectId}`, next)
+  }
+
+  // plain clicks open the drawer; modified/middle clicks keep native navigation
+  function openTaskDrawer(e: MouseEvent, taskId: number) {
+    if (
+      e.button !== 0 ||
+      e.metaKey ||
+      e.ctrlKey ||
+      e.shiftKey ||
+      e.altKey
+    ) {
+      return
+    }
+    e.preventDefault()
+    setSearchParams({ task: String(taskId) })
+  }
+
+  function closeTaskDrawer() {
+    setSearchParams({}, { replace: true })
   }
 
   async function moveTask(taskId: number, status: string, position: number) {
@@ -294,7 +318,11 @@ export default function ProjectDetailPage() {
         ) : tasks.length === 0 ? (
           <p className="muted">No tasks yet — create the first one above.</p>
         ) : view === 'board' ? (
-          <BoardView tasks={tasks} onMove={moveTask} />
+          <BoardView
+            tasks={tasks}
+            onMove={moveTask}
+            onTaskClick={openTaskDrawer}
+          />
         ) : (
           grouped.map((g) => (
             <section key={g.status} className="task-group">
@@ -374,7 +402,12 @@ export default function ProjectDetailPage() {
                       <>
                         <div className="task-main">
                           <strong>
-                            <Link to={`/tasks/${t.id}`}>{t.title}</Link>
+                            <Link
+                              to={`/tasks/${t.id}`}
+                              onClick={(e) => openTaskDrawer(e, t.id)}
+                            >
+                              {t.title}
+                            </Link>
                           </strong>
                           {t.description && (
                             <p className="muted task-desc">{t.description}</p>
@@ -415,6 +448,12 @@ export default function ProjectDetailPage() {
           ))
         )}
       </Card>
+
+      <TaskDrawer
+        taskId={drawerTaskId}
+        open={drawerTaskId !== null}
+        onClose={closeTaskDrawer}
+      />
     </>
   )
 }

@@ -1,0 +1,26 @@
+{
+  "feature": "task-drawer",
+  "status": "running",
+  "iterations": 0,
+  "updated": "2026-11-20T06:04:26Z",
+  "waves": {
+    "1": {
+      "status": "in-progress",
+      "branch": "feat/task-drawer-w1",
+      "pr": "\u2014",
+      "evidence": "\u2014",
+      "updated": "2026-11-20T06:04:26Z"
+    }
+  },
+  "gates": {
+    "G1": {
+      "status": "met",
+      "evidence": "specs/task-drawer/DECISION-REVIEW.md \u2014 challenger REVISE, all 9 findings folded into SPEC/EXAMPLES/BACKLOG",
+      "updated": "2026-11-20T06:04:25Z"
+    }
+  },
+  "events": [
+    "2026-11-20T06:04:25Z gate G1 met: specs/task-drawer/DECISION-REVIEW.md \u2014 challenger REVISE, all 9 findings folded into SPEC/EXAMPLES/BACKLOG",
+    "2026-11-20T06:04:26Z start wave 1 on feat/task-drawer-w1"
+  ]
+}

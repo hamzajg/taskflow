@@ -34,6 +34,14 @@ export default function AppShell() {
     api.get<WorkspaceDto[]>('/workspaces').then(setWorkspaces).catch(() => {})
   }, [])
 
+  // A user with exactly one workspace (e.g. the auto-provisioned default)
+  // always has it active — no selection step on first run.
+  useEffect(() => {
+    if (workspaces.length === 1 && activeWorkspaceId !== workspaces[0].id) {
+      setActiveWorkspaceId(workspaces[0].id)
+    }
+  }, [workspaces, activeWorkspaceId])
+
   useEffect(() => {
     api.get<User>('/auth/me')
       .then((u) => {

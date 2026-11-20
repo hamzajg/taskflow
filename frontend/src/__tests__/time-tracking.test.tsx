@@ -319,3 +319,137 @@ describe('Time tracking — "Member sees own-entry controls only" (@w2)', () => 
     await waitFor(() => expect(within(own).getByText('1h')).toBeTruthy())
   })
 })
+
+describe('Time tracking — "Project surfaces show per-task and aggregate totals" (@w3)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    const timed = { ...TASK, id: 11, title: 'Write launch copy', totalMinutes: 75 }
+    const untimed = { ...TASK, id: 12, title: 'Untimed task', totalMinutes: 0 }
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) => {
+        const url = String(input)
+        if (url === '/auth/me') return Promise.resolve(jsonResponse(USER))
+        if (url === '/workspaces') {
+          return Promise.resolve(jsonResponse([{ ...WORKSPACE, role: 'owner' }]))
+        }
+        if (url === '/projects/5') return Promise.resolve(jsonResponse(PROJECT))
+        if (url === '/projects/5/tasks') {
+          return Promise.resolve(jsonResponse([timed, untimed]))
+        }
+        if (url === '/workspaces/1/members') {
+          return Promise.resolve(jsonResponse([]))
+        }
+        return Promise.resolve(jsonResponse({ message: 'not found' }, 404))
+      }),
+    )
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('shows logged time on task rows and an aggregate on the project', async () => {
+    renderAt('/projects/5')
+    expect(await screen.findByText('1h 15m logged')).toBeTruthy()
+    expect(screen.getByText('Total time: 1h 15m')).toBeTruthy()
+    // untimed task shows no time chip
+    const untimedRow = screen.getByText('Untimed task').closest('li') as HTMLElement
+    expect(within(untimedRow).queryByText(/logged/)).toBeNull()
+  })
+})
+
+describe('Time tracking — "Totals refresh after logging and stopping" (@w3)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    const state = { taskTotal: 0 }
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input)
+        const method = init?.method ?? 'GET'
+        if (url === '/auth/me') return Promise.resolve(jsonResponse(USER))
+        if (url === '/workspaces') {
+          return Promise.resolve(jsonResponse([{ ...WORKSPACE, role: 'member' }]))
+        }
+        if (url === '/projects/5') return Promise.resolve(jsonResponse(PROJECT))
+        if (url === '/tasks/11' && method === 'GET') {
+          return Promise.resolve(jsonResponse({ ...TASK, totalMinutes: state.taskTotal }))
+        }
+        if (url === '/tasks/11/comments') {
+          return Promise.resolve(jsonResponse({ comments: [], hasMore: false }))
+        }
+        if (url === '/tasks/11/time-entries' && method === 'GET') {
+          return Promise.resolve(jsonResponse({ entries: [], running: null }))
+        }
+        if (url === '/tasks/11/time-entries' && method === 'POST') {
+          const body = JSON.parse(String(init?.body)) as { minutes: number }
+          state.taskTotal += body.minutes
+          const created = entry({ id: 90, minutes: body.minutes })
+          return Promise.resolve(jsonResponse(created, 201))
+        }
+        return Promise.resolve(jsonResponse({ message: 'not found' }, 404))
+      }),
+    )
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('task total and card header update after logging an entry', async () => {
+    renderAt('/tasks/11')
+    const section = await screen.findByRole('region', { name: /time tracking/i })
+    expect(screen.getByText('Total: 0m')).toBeTruthy()
+
+    fireEvent.change(within(section).getByLabelText(/^minutes$/i), {
+      target: { value: '30' },
+    })
+    fireEvent.click(within(section).getByRole('button', { name: /log time/i }))
+
+    await waitFor(() => expect(screen.getByText('Total: 30m')).toBeTruthy())
+    // entry row + "Time logged" field both show the new total
+    expect(screen.getAllByText('30m').length).toBeGreaterThanOrEqual(2)
+  })
+})
+
+describe('Time tracking — "Time UI meets the accessibility bar in both themes" (@w3)', () => {
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+  for (const theme of ['light', 'dark'] as const) {
+    it(`labels all time controls under ${theme} theme`, async () => {
+      localStorage.setItem('tf-theme', theme)
+      mockApi({
+        entries: ENTRIES.map((e) => ({ ...e })),
+        running: null,
+        role: 'member',
+      })
+      renderAt('/tasks/11')
+      const section = await screen.findByRole('region', { name: /time tracking/i })
+      await within(section).findByText(/Hero copy/)
+
+      expect(within(section).getByLabelText(/^date$/i)).toBeTruthy()
+      expect(within(section).getByLabelText(/^minutes$/i)).toBeTruthy()
+      expect(within(section).getByLabelText(/^description$/i)).toBeTruthy()
+      expect(
+        within(section).getByRole('button', { name: /log time/i }),
+      ).toBeTruthy()
+      expect(
+        within(section).getByRole('button', { name: /start timer/i }),
+      ).toBeTruthy()
+      // own-entry controls carry author context
+      const own = within(section).getByText(/Hero copy/).closest('li') as HTMLElement
+      expect(
+        within(own).getByRole('button', { name: 'Edit time entry by Demo User' }),
+      ).toBeTruthy()
+      expect(
+        within(own).getByRole('button', { name: 'Delete time entry by Demo User' }),
+      ).toBeTruthy()
+    })
+  }
+})

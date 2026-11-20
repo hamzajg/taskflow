@@ -9,14 +9,7 @@ import CommentThread from '../components/CommentThread'
 import PageHeader from '../components/PageHeader'
 import TimeSection from '../components/TimeSection'
 import { useShell } from '../shell/ShellContext'
-import { priorityTone, ProjectDto, statusLabel, TaskDto } from './projectTypes'
-
-function formatTotal(minutes: number): string {
-  const h = Math.floor(minutes / 60)
-  const m = minutes % 60
-  if (h === 0) return `${m}m`
-  return m === 0 ? `${h}h` : `${h}h ${m}m`
-}
+import { formatMinutes, priorityTone, ProjectDto, statusLabel, TaskDto } from './projectTypes'
 
 export default function TaskDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -52,6 +45,15 @@ export default function TaskDetailPage() {
     const ws = workspaces.find((w) => w.id === workspaceId)
     return ws?.role === 'owner' || ws?.role === 'admin'
   }
+
+  // silent refetch after time mutations so totals stay fresh (no page flicker)
+  const refreshTask = useCallback(async () => {
+    try {
+      setTask(await api.get<TaskDto>(`/tasks/${taskId}`))
+    } catch {
+      // totals are best-effort; the section already reflects the mutation
+    }
+  }, [taskId])
 
   if (loading) {
     return (
@@ -110,16 +112,22 @@ export default function TaskDetailPage() {
           </div>
           <div>
             <dt>Time logged</dt>
-            <dd>{formatTotal(task.totalMinutes)}</dd>
+            <dd>{formatMinutes(task.totalMinutes)}</dd>
           </div>
         </dl>
       </Card>
 
       <Card
         title="Time"
-        actions={<span className="muted">Total: {formatTotal(task.totalMinutes ?? 0)}</span>}
+        actions={
+          <span className="muted">Total: {formatMinutes(task.totalMinutes ?? 0)}</span>
+        }
       >
-        <TimeSection taskId={taskId} canModerate={canModerate(project?.workspaceId)} />
+        <TimeSection
+          taskId={taskId}
+          canModerate={canModerate(project?.workspaceId)}
+          onChanged={refreshTask}
+        />
       </Card>
 
       <Card title="Comments">

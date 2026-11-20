@@ -1,0 +1,25 @@
+# Gates: action-a11y
+
+> Preconditions for phase transitions. Each `## G<n> — <title>` block is a
+> gate. `ship_loop` refuses to advance past a phase while a blocking gate is
+> pending. Definitions live here; status and evidence live in `LOOP.md`.
+>
+> Gate phases: `spec` (before writing the spec), `plan` (before planning
+> waves), `wave:<n>` (before starting wave n), `validate` (before validation),
+> `finish` (before closing the feature).
+>
+> Gate types: decision | artifact | external | technical | quality | data.
+> Resolver: `human` (needs a person to decide/provide something) or `agent`
+> (the agent can satisfy it). Check: `manual`, `file:<repo-relative-path>`, or
+> `command:<exact command>` (the agent runs it and records the output as
+> evidence — the oracle never executes it).
+
+## G1 — Design decisions challenged
+- Before: plan
+- Type: artifact
+- Owner: agent
+- Resolver: agent
+- Blocking: yes
+- Check: file:specs/action-a11y/DECISION-REVIEW.md
+- Why: Small but user-facing change to accessible names across shared
+  components; the review artifact must exist before wave planning.

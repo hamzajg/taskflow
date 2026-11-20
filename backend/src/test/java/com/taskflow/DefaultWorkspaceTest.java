@@ -101,9 +101,9 @@ public class DefaultWorkspaceTest {
                 .body("[0].memberCount", equalTo(1));
     }
 
-    // Scenario: Default workspace names the user (blank/long first names)
+    // Scenario: Over-long first names cannot break login
     @Test
-    public void default_workspace_name_is_truncated_to_fit_column() {
+    public void over_long_first_names_cannot_break_login() {
         String longFirst = "A".repeat(250);
         registerVerifyLogin("long@example.com", longFirst);
 

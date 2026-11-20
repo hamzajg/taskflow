@@ -5,6 +5,7 @@
 | action-a11y (`action-a11y/`) | 2 | 6 | 2 | yes | no |
 | app-shell (`app-shell/`) | 4 | 8 | 4 | yes | yes |
 | create-pane (`create-pane/`) | 3 | 11 | 3 | yes | yes |
+| default-workspace (`default-workspace/`) | 2 | 11 | 2 | yes | yes |
 | home-landing (`home-landing/`) | 3 | 12 | 3 | yes | yes |
 | projects-tasks (`projects-tasks/`) | 4 | 15 | 4 | yes | yes |
 | task-detail (`task-detail/`) | 3 | 12 | 3 | yes | yes |

@@ -36,6 +36,12 @@ Feature: action-a11y
     And the projects card carries a distinct title
 
   @w2 @a11y
+  Scenario: Member remove action names the member
+    Given the workspace manage drawer open on a workspace with members
+    When a screen reader encounters a member's Remove button
+    Then its accessible name identifies that member
+
+  @w2 @a11y
   Scenario: Action labels work in both themes
     Given the task list in light and dark themes
     Then the accessible names are identical in both themes

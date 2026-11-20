@@ -14,14 +14,15 @@ Scenarios proven by this wave:
 
 | Item | Title | Size | Deps | Notes |
 |------|-------|------|------|-------|
-| US1 | As a screen-reader user, I want task actions to name their task, so that I can tell which task I'm editing, deleting or moving | S | — | aria-labels on TaskItem Edit/Delete, BoardView Move toggle, CommentThread Edit/Delete (by author); migrate drawer.test.tsx + projects.test.tsx Move name queries. |
+| US1 | As a screen-reader user, I want task actions to name their task, so that I can tell which task I'm editing, deleting or moving | S | — | aria-labels on TaskItem Edit/Delete, BoardView Move toggle, CommentThread Edit/Delete (by author); migrate drawer.test.tsx + projects.test.tsx Move name queries + task-detail.test.tsx comment Edit/Delete anchored-name queries. |
 
 ## Wave 2 — iteration 2
 
 Scenarios proven by this wave:
 - Projects page shows one Projects heading
+- Member remove action names the member
 - Action labels work in both themes
 
 | Item | Title | Size | Deps | Notes |
 |------|-------|------|------|-------|
-| US2 | As a user, I want the projects page to show one Projects heading, so that the page structure reads cleanly | S | — | Card title "Projects" → "All projects"; both-theme check that nothing visual regressed. |
+| US2 | As a user, I want the projects page to show one Projects heading, so that the page structure reads cleanly | S | — | Card title "Projects" → "All projects"; WorkspaceDrawer member Remove gets aria-label naming the member (audit found workspace-pane delegation never happened); both-theme check that nothing visual regressed. |

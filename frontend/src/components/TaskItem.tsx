@@ -2,6 +2,7 @@ import { FormEvent, MouseEvent } from 'react'
 import { Link } from 'react-router-dom'
 import Badge from './Badge'
 import Button from './Button'
+import DueDate from './DueDate'
 import TaskFormFields, { TaskFormValue } from './TaskFormFields'
 import { formatMinutes, MemberDto, priorityTone, TaskDto } from '../pages/projectTypes'
 
@@ -61,7 +62,7 @@ export default function TaskItem({
             <div className="task-meta">
               <Badge tone={priorityTone(task.priority)}>{task.priority}</Badge>
               <span className="muted">{task.assigneeName ?? 'Unassigned'}</span>
-              {task.dueDate && <span className="muted">Due {task.dueDate}</span>}
+              {task.dueDate && <DueDate task={task} />}
               {(task.totalMinutes ?? 0) > 0 && (
                 <span className="muted">{formatMinutes(task.totalMinutes)} logged</span>
               )}

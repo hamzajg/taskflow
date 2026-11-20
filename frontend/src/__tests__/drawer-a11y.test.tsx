@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { readFileSync } from 'node:fs'
@@ -111,6 +111,8 @@ describe('Drawer a11y — "Drawer meets the accessibility bar in both themes" (@
     renderAt('/projects/5?task=11')
     const dialog = (await screen.findByRole('dialog')) as HTMLElement
     await waitFor(() => expect(dialog.contains(document.activeElement)).toBe(true))
+    // wait for async content (task + comments + time) so the focusable count is stable
+    await within(dialog).findByText('Open full page')
 
     const focusables = dialog.querySelectorAll<HTMLElement>(
       'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled])',

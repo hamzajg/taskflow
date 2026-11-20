@@ -6,6 +6,7 @@ import Badge from '../components/Badge'
 import Button from '../components/Button'
 import Card from '../components/Card'
 import CommentThread from '../components/CommentThread'
+import DueDate from '../components/DueDate'
 import PageHeader from '../components/PageHeader'
 import TimeSection from '../components/TimeSection'
 import { useShell } from '../shell/ShellContext'
@@ -108,7 +109,7 @@ export default function TaskDetailPage() {
           </div>
           <div>
             <dt>Due date</dt>
-            <dd>{task.dueDate ?? '—'}</dd>
+            <dd>{task.dueDate ? <DueDate task={task} /> : '—'}</dd>
           </div>
           <div>
             <dt>Time logged</dt>

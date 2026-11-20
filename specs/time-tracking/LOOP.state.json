@@ -2,14 +2,14 @@
   "feature": "time-tracking",
   "status": "running",
   "iterations": 0,
-  "updated": "2026-11-20T16:36:19Z",
+  "updated": "2026-11-20T16:43:36Z",
   "waves": {
     "1": {
-      "status": "in-progress",
+      "status": "done",
       "branch": "feat/time-tracking-w1",
-      "pr": "\u2014",
-      "evidence": "\u2014",
-      "updated": "2026-11-20T16:36:19Z"
+      "pr": "56",
+      "evidence": "backend 64/64; TimeEntryResourceTest 6/6; evidence 20261120T164328Z-ca6599c verified",
+      "updated": "2026-11-20T16:43:36Z"
     }
   },
   "gates": {
@@ -21,6 +21,7 @@
   },
   "events": [
     "2026-11-20T16:36:19Z gate G1 met: specs/time-tracking/DECISION-REVIEW.md",
-    "2026-11-20T16:36:19Z start wave 1 on feat/time-tracking-w1"
+    "2026-11-20T16:36:19Z start wave 1 on feat/time-tracking-w1",
+    "2026-11-20T16:43:36Z complete wave 1 (56): backend 64/64; TimeEntryResourceTest 6/6; evidence 20261120T164328Z-ca6599c verified"
   ]
 }

@@ -13,6 +13,7 @@
 | task-detail (`task-detail/`) | 3 | 12 | 3 | yes | yes |
 | task-drawer (`task-drawer/`) | 3 | 13 | 3 | yes | yes |
 | time-tracking (`time-tracking/`) | 3 | 16 | 3 | yes | yes |
+| ux-polish (`ux-polish/`) | 3 | 7 | 3 | yes | yes |
 | workspace-pane (`workspace-pane/`) | 3 | 14 | 3 | yes | yes |
 | workspaces-accounts (`workspaces-accounts/`) | 6 | 12 | 4 | yes | yes |
 

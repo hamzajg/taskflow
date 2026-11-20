@@ -24,6 +24,7 @@ const SUMMARY_1 = {
   overdueCount: 1,
   dueSoonCount: 2,
   myOpenTaskCount: 2,
+  timeMinutesTotal: 95,
 }
 
 const SUMMARY_2 = {
@@ -33,6 +34,7 @@ const SUMMARY_2 = {
   overdueCount: 0,
   dueSoonCount: 0,
   myOpenTaskCount: 0,
+  timeMinutesTotal: 0,
 }
 
 const PROJECTS_1 = [
@@ -41,8 +43,9 @@ const PROJECTS_1 = [
     workspaceId: 1,
     name: 'Website redesign',
     description: null,
-    color: null,
+    color: '#7c3aed',
     taskCount: 10,
+    tags: [{ id: 1, title: 'Client X', color: '#0ea5e9' }],
     createdAt: '2026-11-18T00:00:00Z',
   },
 ]
@@ -125,7 +128,7 @@ describe('Dashboard — "Dashboard shows workspace stat cards"', () => {
     // single workspace auto-selects; wait for summary-loaded cards
     expect(await screen.findByText('Backlog tasks')).toBeTruthy()
     const cards = document.querySelectorAll('.stat-card')
-    expect(cards.length).toBe(9) // 5 fixed + 4 status
+    expect(cards.length).toBe(10) // 6 fixed + 4 status
     expect(screen.getAllByText('Projects').length).toBeGreaterThan(0)
     expect(screen.getAllByText('2').length).toBeGreaterThan(0) // projectCount/myOpen
     expect(screen.getByText('My open tasks')).toBeTruthy()
@@ -161,6 +164,7 @@ describe('Dashboard — "Dashboard shows workspace stat cards"', () => {
               overdueCount: 0,
               dueSoonCount: 0,
               myOpenTaskCount: 0,
+              timeMinutesTotal: 0,
             }),
           )
         }
@@ -171,7 +175,7 @@ describe('Dashboard — "Dashboard shows workspace stat cards"', () => {
     renderAt('/dashboard')
     expect(await screen.findByText(/no projects yet/i)).toBeTruthy()
     expect(await screen.findByText('Backlog tasks')).toBeTruthy()
-    expect(document.querySelectorAll('.stat-card').length).toBe(9)
+    expect(document.querySelectorAll('.stat-card').length).toBe(10)
   })
 
   it('Dashboard error offers retry — shows an error with retry when the summary request fails', async () => {
@@ -211,5 +215,43 @@ describe('Dashboard — "Dashboard follows the sidebar workspace selection"', ()
     // SUMMARY_2: projectCount 1, memberCount 5, myOpen 0
     expect(await screen.findByText('Beta launch')).toBeTruthy()
     expect(screen.queryByText('Website redesign')).toBeNull()
+  })
+})
+
+describe('ux-polish @w3 — "Dashboard shows project identity and time totals"', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi({ workspaces: [WORKSPACES[0]] })
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('shows a Time logged stat and project color/tag identity', async () => {
+    renderAt('/dashboard')
+    expect(await screen.findByText('Time logged')).toBeTruthy()
+    // 95 minutes → 1h 35m
+    expect(await screen.findByText('1h 35m')).toBeTruthy()
+    // project row carries color swatch + tag badge
+    const link = await screen.findByRole('link', { name: /Website redesign/ })
+    const row = link.closest('li')!
+    expect(row.querySelector('.project-swatch')).toBeTruthy()
+    expect(within(row).getByText('Client X')).toBeTruthy()
+  })
+
+  it('keeps stat labels and tag badges accessible in both themes', async () => {
+    for (const theme of ['light', 'dark']) {
+      cleanup()
+      localStorage.setItem('tf-theme', theme)
+      mockApi({ workspaces: [WORKSPACES[0]] })
+      renderAt('/dashboard')
+      expect(await screen.findByText('Time logged')).toBeTruthy()
+      const link = await screen.findByRole('link', { name: /Website redesign/ })
+      const row = link.closest('li')!
+      expect(within(row).getByText('Client X')).toBeTruthy()
+      expect(screen.getByLabelText(/workspace stats/i)).toBeTruthy()
+    }
   })
 })

@@ -10,7 +10,7 @@ import ProjectCreateDrawer from './ProjectCreateDrawer'
 import TagManageDrawer from './TagManageDrawer'
 import TagBadges from '../components/TagBadges'
 import { useShell } from '../shell/ShellContext'
-import { ProjectDto, TagDto } from './projectTypes'
+import { ProjectDto, safeCssColor, TagDto } from './projectTypes'
 
 export default function ProjectsPage() {
   const { workspaces, activeWorkspaceId } = useShell()
@@ -119,7 +119,7 @@ export default function ProjectsPage() {
                 >
                   <span
                     className="tag-dot"
-                    style={{ background: t.color ?? 'var(--muted)' }}
+                    style={{ background: safeCssColor(t.color) ?? 'var(--muted)' }}
                     aria-hidden="true"
                   />
                   {t.title}
@@ -141,7 +141,7 @@ export default function ProjectsPage() {
                   {p.color && (
                     <span
                       className="project-swatch"
-                      style={{ background: p.color }}
+                      style={{ background: safeCssColor(p.color) }}
                       aria-hidden="true"
                     />
                   )}

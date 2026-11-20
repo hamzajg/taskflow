@@ -131,6 +131,12 @@ export function relativeDueLabel(
   return `Due in ${diff} d`
 }
 
+// project/tag colors are free-text up to 20 chars server-side; only emit
+// values that can't smuggle a url()/expression() into inline styles
+export function safeCssColor(color: string | null | undefined): string | undefined {
+  return color && /^(#[0-9a-fA-F]{3,8}|[a-zA-Z]{1,20})$/.test(color) ? color : undefined
+}
+
 export function priorityTone(priority: string): 'neutral' | 'primary' | 'success' | 'warning' | 'danger' {
   switch (priority) {
     case 'urgent':

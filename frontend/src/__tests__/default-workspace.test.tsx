@@ -22,6 +22,7 @@ const SUMMARY = {
   overdueCount: 0,
   dueSoonCount: 0,
   myOpenTaskCount: 0,
+  timeMinutesTotal: 0,
 }
 
 function jsonResponse(body: unknown, status = 200) {

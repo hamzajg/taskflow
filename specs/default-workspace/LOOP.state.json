@@ -1,0 +1,17 @@
+{
+  "feature": "default-workspace",
+  "status": "running",
+  "iterations": 0,
+  "updated": "2026-11-20T08:45:52Z",
+  "waves": {},
+  "gates": {
+    "G1": {
+      "status": "met",
+      "evidence": "specs/default-workspace/DECISION-REVIEW.md (challenger REVISE \u2192 all 6 findings folded; post-fold ACCEPT)",
+      "updated": "2026-11-20T08:45:52Z"
+    }
+  },
+  "events": [
+    "2026-11-20T08:45:52Z gate G1 met: specs/default-workspace/DECISION-REVIEW.md (challenger REVISE \u2192 all 6 findings folded; post-fold ACCEPT)"
+  ]
+}

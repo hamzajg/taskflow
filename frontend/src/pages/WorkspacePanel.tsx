@@ -58,7 +58,7 @@ export default function WorkspacePanel({
 
       {drawerWs && (
         <WorkspaceDrawer
-          workspace={drawerWs}
+          workspace={workspaces.find((w) => w.id === drawerWs.id) ?? drawerWs}
           open={openId !== null}
           onClose={() => setOpenId(null)}
           onChanged={onChanged}

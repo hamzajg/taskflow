@@ -1,3 +1,9 @@
+export interface TagDto {
+  id: number
+  title: string
+  color: string | null
+}
+
 export interface ProjectDto {
   id: number
   workspaceId: number
@@ -5,6 +11,7 @@ export interface ProjectDto {
   description: string | null
   color: string | null
   taskCount: number
+  tags: TagDto[]
   createdAt: string
 }
 

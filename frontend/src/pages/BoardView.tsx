@@ -1,4 +1,5 @@
 import { DragEvent, FormEvent, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Badge from '../components/Badge'
 import Button from '../components/Button'
 import Input from '../components/Input'
@@ -138,7 +139,9 @@ export default function BoardView({
                   ) : (
                     <>
                       <div className="task-main">
-                        <strong>{t.title}</strong>
+                        <strong>
+                          <Link to={`/tasks/${t.id}`}>{t.title}</Link>
+                        </strong>
                         {t.description && (
                           <p className="muted task-desc">{t.description}</p>
                         )}

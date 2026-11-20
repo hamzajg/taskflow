@@ -187,6 +187,7 @@ export default function WorkspaceDrawer({
                   <Button
                     variant="link"
                     size="sm"
+                    aria-label={`Remove ${m.displayName}`}
                     disabled={pending}
                     onClick={() => removeMember(m.userId)}
                   >

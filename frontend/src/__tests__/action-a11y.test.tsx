@@ -98,6 +98,7 @@ function mockApi() {
     '/projects/5/tasks': TASKS,
     '/workspaces/1/members': [
       { userId: 1, displayName: 'Demo User', email: USER.email, role: 'owner' },
+      { userId: 2, displayName: 'Mem Ber', email: 'mem@taskflow.local', role: 'member' },
     ],
     '/tasks/11': { ...TASKS[0], projectName: 'Website redesign' },
     '/tasks/11/comments': { comments: COMMENTS, hasMore: false },
@@ -221,5 +222,78 @@ describe('action-a11y — "Inline edit actions stay scoped" (@w1)', () => {
     expect(within(row).getByRole('button', { name: 'Cancel' })).toBeTruthy()
     expect(within(row).queryByRole('button', { name: /Edit "/ })).toBeNull()
     expect(within(row).queryByRole('button', { name: /Delete "/ })).toBeNull()
+  })
+})
+
+describe('action-a11y — "Projects page shows one Projects heading" (@w2)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('exactly one heading reads Projects; card carries a distinct title', async () => {
+    renderAt('/projects')
+    await screen.findByText('Website redesign')
+    const headings = screen.getAllByRole('heading', { name: 'Projects' })
+    expect(headings).toHaveLength(1)
+    expect(headings[0].tagName).toBe('H1')
+    expect(screen.getByRole('heading', { name: 'All projects' })).toBeTruthy()
+  })
+})
+
+describe('action-a11y — "Member remove action names the member" (@w2)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('Remove button in the workspace drawer names the member', async () => {
+    renderAt('/account')
+    fireEvent.click(await screen.findByRole('button', { name: 'Acme' }))
+    expect(await screen.findByRole('dialog')).toBeTruthy()
+    expect(
+      await screen.findByRole('button', { name: 'Remove Mem Ber' }),
+    ).toBeTruthy()
+    // owner row has no Remove (role gate preserved)
+    expect(
+      screen.queryByRole('button', { name: 'Remove Demo User' }),
+    ).toBeNull()
+  })
+})
+
+describe('action-a11y — "Action labels work in both themes" (@w2)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('accessible names are identical in light and dark themes', async () => {
+    for (const theme of ['light', 'dark']) {
+      localStorage.setItem('tf-theme', theme)
+      const { unmount } = renderAt('/projects/5')
+      await screen.findByText('Write copy')
+      expect(
+        screen.getByRole('button', { name: 'Edit "Write copy"' }),
+      ).toBeTruthy()
+      expect(
+        screen.getByRole('button', { name: 'Delete "Write copy"' }),
+      ).toBeTruthy()
+      unmount()
+    }
   })
 })

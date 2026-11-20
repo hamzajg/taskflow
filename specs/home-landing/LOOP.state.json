@@ -1,0 +1,26 @@
+{
+  "feature": "home-landing",
+  "status": "running",
+  "iterations": 0,
+  "updated": "2026-11-20T05:10:36Z",
+  "waves": {
+    "1": {
+      "status": "in-progress",
+      "branch": "feat/home-landing-w1",
+      "pr": "\u2014",
+      "evidence": "\u2014",
+      "updated": "2026-11-20T05:10:36Z"
+    }
+  },
+  "gates": {
+    "G1": {
+      "status": "met",
+      "evidence": "specs/home-landing/DECISION-REVIEW.md (verdict REVISE, all findings folded into SPEC.md; spec audit PASS)",
+      "updated": "2026-11-20T05:10:36Z"
+    }
+  },
+  "events": [
+    "2026-11-20T05:10:36Z gate G1 met: specs/home-landing/DECISION-REVIEW.md (verdict REVISE, all findings folded into SPEC.md; spec audit PASS)",
+    "2026-11-20T05:10:36Z start wave 1 on feat/home-landing-w1"
+  ]
+}

@@ -12,4 +12,5 @@ export interface WorkspaceSummaryDto {
   overdueCount: number
   dueSoonCount: number
   myOpenTaskCount: number
+  timeMinutesTotal: number
 }

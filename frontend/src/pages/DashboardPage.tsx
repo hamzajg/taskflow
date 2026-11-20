@@ -4,6 +4,7 @@ import {
   AlarmClock,
   FolderKanban,
   ListTodo,
+  Timer,
   Users,
 } from 'lucide-react'
 import { api, ApiError } from '../api'
@@ -12,6 +13,8 @@ import Button from '../components/Button'
 import Card from '../components/Card'
 import PageHeader from '../components/PageHeader'
 import StatCard from '../components/StatCard'
+import TagBadges from '../components/TagBadges'
+import { formatMinutes } from './projectTypes'
 import { useShell } from '../shell/ShellContext'
 import { ProjectDto, statusLabel } from './projectTypes'
 import { WorkspaceSummaryDto } from './workspaceTypes'
@@ -133,6 +136,11 @@ export default function DashboardPage() {
             label="Due soon"
             value={summary?.dueSoonCount ?? '—'}
           />
+          <StatCard
+            icon={<Timer size={20} />}
+            label="Time logged"
+            value={summary ? formatMinutes(summary.timeMinutesTotal) : '—'}
+          />
           {statusEntries.map(([status, count]) => (
             <StatCard
               key={status}
@@ -163,10 +171,18 @@ export default function DashboardPage() {
               <li key={p.id} className="task-item">
                 <div className="task-main">
                   <strong>
+                    {p.color && (
+                      <span
+                        className="project-swatch"
+                        style={{ background: p.color }}
+                        aria-hidden="true"
+                      />
+                    )}
                     <Link to={`/projects/${p.id}`}>{p.name}</Link>
                   </strong>
                   <div className="task-meta">
                     <span className="muted">{p.taskCount} tasks</span>
+                    <TagBadges tags={p.tags} />
                   </div>
                 </div>
               </li>

@@ -31,7 +31,7 @@ function mockApi() {
       if (url === '/auth/me') return Promise.resolve(jsonResponse(USER))
       if (url === '/workspaces') return Promise.resolve(jsonResponse(WORKSPACES))
       if (url === '/workspaces/1/summary')
-        return Promise.resolve(jsonResponse({ projectCount: 0, memberCount: 1, tasksByStatus: {}, overdueCount: 0, dueSoonCount: 0, myOpenTaskCount: 0 }))
+        return Promise.resolve(jsonResponse({ projectCount: 0, memberCount: 1, tasksByStatus: {}, overdueCount: 0, dueSoonCount: 0, myOpenTaskCount: 0, timeMinutesTotal: 0 }))
       if (url === '/workspaces/1/projects') return Promise.resolve(jsonResponse([]))
       if (url === '/workspaces/1/members')
         return Promise.resolve(jsonResponse([{ id: 1, userId: 1, email: USER.email, firstName: 'Demo', lastName: 'User', role: 'owner' }]))

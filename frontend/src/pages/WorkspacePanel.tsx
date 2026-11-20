@@ -28,7 +28,6 @@ export default function WorkspacePanel({
 
   return (
     <Card
-      title="Workspaces"
       actions={
         <Button size="sm" onClick={() => setCreateOpen(true)}>
           New workspace

@@ -2,6 +2,7 @@ import { DragEvent, FormEvent, MouseEvent, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Badge from '../components/Badge'
 import Button from '../components/Button'
+import DueDate from '../components/DueDate'
 import Input from '../components/Input'
 import Select from '../components/Select'
 import {
@@ -160,9 +161,7 @@ export default function BoardView({
                           <span className="muted">
                             {t.assigneeName ?? 'Unassigned'}
                           </span>
-                          {t.dueDate && (
-                            <span className="muted">Due {t.dueDate}</span>
-                          )}
+                          {t.dueDate && <DueDate task={t} />}
                           {(t.totalMinutes ?? 0) > 0 && (
                             <span className="muted">
                               {formatMinutes(t.totalMinutes)} logged

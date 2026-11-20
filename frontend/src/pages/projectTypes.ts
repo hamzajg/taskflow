@@ -99,6 +99,38 @@ export function formatMinutes(minutes: number | null | undefined): string {
   return m === 0 ? `${h}h` : `${h}h ${m}m`
 }
 
+export function todayLocalISO(): string {
+  const d = new Date()
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+}
+
+// YYYY-MM-DD strings compare lexicographically; day diff via UTC-midnight math
+// is safe because both operands are date-only (no timezone component).
+export function dueDayDiff(dueDate: string, today: string = todayLocalISO()): number {
+  const [y, m, d] = dueDate.split('-').map(Number)
+  const [ty, tm, td] = today.split('-').map(Number)
+  return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(ty, tm - 1, td)) / 86400000)
+}
+
+export function isTaskOverdue(task: Pick<TaskDto, 'dueDate' | 'status'>): boolean {
+  return task.dueDate !== null && task.dueDate < todayLocalISO() && task.status !== 'done'
+}
+
+// null → render the bare ISO date (far-future or completed tasks)
+export function relativeDueLabel(
+  task: Pick<TaskDto, 'dueDate' | 'status'>,
+  today: string = todayLocalISO(),
+): string | null {
+  if (task.dueDate === null) return null
+  if (isTaskOverdue(task)) return 'Overdue'
+  const diff = dueDayDiff(task.dueDate, today)
+  if (task.status === 'done' || diff > 14) return null
+  if (diff === 0) return 'Due today'
+  if (diff === 1) return 'Due tomorrow'
+  return `Due in ${diff} d`
+}
+
 export function priorityTone(priority: string): 'neutral' | 'primary' | 'success' | 'warning' | 'danger' {
   switch (priority) {
     case 'urgent':

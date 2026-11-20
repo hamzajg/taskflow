@@ -57,15 +57,46 @@ export default function ProjectDetailPage() {
   const [editForm, setEditForm] = useState<TaskFormValue>(EMPTY_TASK_FORM)
   const [createOpen, setCreateOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
+  const viewParam = searchParams.get('view')
+  const urlView = viewParam === 'board' || viewParam === 'list' ? viewParam : null
   const [view, setView] = useState<'list' | 'board'>(() =>
-    localStorage.getItem(`taskflow.view.${projectId}`) === 'board'
+    urlView ??
+    (localStorage.getItem(`taskflow.view.${projectId}`) === 'board'
       ? 'board'
-      : 'list',
+      : 'list'),
   )
+
+  // component is reused across /projects/:id navigations — reseed on id/param change
+  useEffect(() => {
+    const saved =
+      localStorage.getItem(`taskflow.view.${projectId}`) === 'board'
+        ? 'board'
+        : 'list'
+    setView(urlView ?? saved)
+  }, [projectId, urlView])
 
   function switchView(next: 'list' | 'board') {
     setView(next)
     localStorage.setItem(`taskflow.view.${projectId}`, next)
+    setSearchParams(
+      (prev) => {
+        const p = new URLSearchParams(prev)
+        p.set('view', next)
+        return p
+      },
+      { replace: true },
+    )
+  }
+
+  function mergeParams(mutate: (p: URLSearchParams) => void) {
+    setSearchParams(
+      (prev) => {
+        const p = new URLSearchParams(prev)
+        mutate(p)
+        return p
+      },
+      { replace: true },
+    )
   }
 
   // plain clicks open the drawer; modified/middle clicks keep native navigation
@@ -80,11 +111,11 @@ export default function ProjectDetailPage() {
       return
     }
     e.preventDefault()
-    setSearchParams({ task: String(taskId) })
+    mergeParams((p) => p.set('task', String(taskId)))
   }
 
   function closeTaskDrawer() {
-    setSearchParams({}, { replace: true })
+    mergeParams((p) => p.delete('task'))
   }
 
   // at most one drawer open: creating clears any open peek (?task=)
@@ -127,6 +158,16 @@ export default function ProjectDetailPage() {
   useEffect(() => {
     load()
   }, [load])
+
+  // silent task-list refresh for drawer mutations — no loading flicker,
+  // and the drawer must stay mounted (full load() would unmount it)
+  const refreshTasks = useCallback(async () => {
+    try {
+      setTasks(await api.get<TaskDto[]>(`/projects/${projectId}/tasks`))
+    } catch {
+      // keep stale list on failure; next explicit load retries
+    }
+  }, [projectId])
 
   async function saveEdit(e: FormEvent) {
     e.preventDefault()
@@ -284,6 +325,7 @@ export default function ProjectDetailPage() {
         taskId={drawerTaskId}
         open={drawerTaskId !== null}
         onClose={closeTaskDrawer}
+        onChanged={refreshTasks}
       />
       <ProjectCreateDrawer
         open={editOpen}

@@ -17,7 +17,7 @@
 
 ## Scenario coverage
 
-- Scenarios: 12 total, 8 with detected test evidence, 3 with weak (token-match) evidence only, 1 without
+- Scenarios: 12 total, 10 with detected test evidence, 2 with weak (token-match) evidence only, 0 without
 - ✓ `Guest sees the landing page at the root` (@w1)
 - ~ `Authenticated user at root is sent to the dashboard` (@w1)
 - ~ `Guest cannot reach the dashboard` (@w1)
@@ -25,9 +25,9 @@
 - ✓ `Dashboard shows workspace stat cards` (@w2)
 - ✓ `Dashboard shows my open tasks for the caller` (@w2)
 - ✓ `Summary endpoint enforces membership` (@w2)
-- ✗ `Dashboard handles empty and loading states` (@w2)
+- ✓ `Dashboard handles empty and loading states` (@w2)
 - ✓ `Dashboard follows the sidebar workspace selection` (@w2)
-- ~ `Dashboard error offers retry` (@w2)
+- ✓ `Dashboard error offers retry` (@w2)
 - ✓ `Reskinned screens meet the accessibility bar in both themes` (@w3)
 - ✓ `Stat cards and headers follow the shared design language` (@w3)
 
@@ -39,7 +39,7 @@
 
 ## Gaps
 
-- 1 scenario(s) lack detected test evidence — verify manually or add checks
+- none — spec is fully traced
 
 Note: 'no evidence' means neither the scenario name nor a
 token match was found in test files — verify by hand before

@@ -7,16 +7,16 @@
 
 ## Scenario coverage
 
-- Scenarios: 13 total, 9 with detected test evidence, 1 with weak (token-match) evidence only, 3 without
+- Scenarios: 13 total, 12 with detected test evidence, 1 with weak (token-match) evidence only, 0 without
 - ✓ `Task title opens the drawer from list view` (@w1)
 - ~ `Board card opens the drawer` (@w1)
 - ✓ `Drawer shows fields and comment thread` (@w1)
 - ✓ `Drawer state lives in the URL` (@w1)
-- ✗ `Task links keep native navigation semantics` (@w1)
-- ✗ `Board drag-and-drop still works` (@w1)
+- ✓ `Task links keep native navigation semantics` (@w1)
+- ✓ `Board drag-and-drop still works` (@w1)
 - ✓ `Drawer dismisses via escape, overlay and close button` (@w1)
 - ✓ `Open full page reaches the canonical detail view` (@w1)
-- ✗ `Detail page still works standalone` (@w1)
+- ✓ `Detail page still works standalone` (@w1)
 - ✓ `List and board interactions still work after decomposition` (@w2)
 - ✓ `CommentThread is shared, not duplicated` (@w2)
 - ✓ `Drawer meets the accessibility bar in both themes` (@w3)
@@ -32,7 +32,7 @@
 
 ## Gaps
 
-- 3 scenario(s) lack detected test evidence — verify manually or add checks
+- none — spec is fully traced
 
 Note: 'no evidence' means neither the scenario name nor a
 token match was found in test files — verify by hand before

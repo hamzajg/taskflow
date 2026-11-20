@@ -88,14 +88,14 @@ export default function ProjectDetailPage() {
     )
   }
 
-  function mergeParams(mutate: (p: URLSearchParams) => void) {
+  function mergeParams(mutate: (p: URLSearchParams) => void, replace = true) {
     setSearchParams(
       (prev) => {
         const p = new URLSearchParams(prev)
         mutate(p)
         return p
       },
-      { replace: true },
+      replace ? { replace: true } : undefined,
     )
   }
 
@@ -111,7 +111,8 @@ export default function ProjectDetailPage() {
       return
     }
     e.preventDefault()
-    mergeParams((p) => p.set('task', String(taskId)))
+    // push (not replace): Back must close the drawer — task-drawer contract
+    mergeParams((p) => p.set('task', String(taskId)), false)
   }
 
   function closeTaskDrawer() {

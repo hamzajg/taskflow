@@ -32,7 +32,13 @@ export default function TaskDrawer({
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (taskId !== null) setActiveId(taskId)
+    if (taskId !== null) {
+      setActiveId(taskId)
+      // drop the previous task synchronously so its TimeSection never paints
+      // (or refetches) under the new id while load() is in flight
+      setTask(null)
+      setProject(null)
+    }
   }, [taskId])
 
   const load = useCallback(async (id: number) => {
@@ -52,6 +58,21 @@ export default function TaskDrawer({
   useEffect(() => {
     if (activeId !== null) load(activeId)
   }, [activeId, load])
+
+  // silent task refetch after time mutations — updates the header Total
+  // without the Loading… flicker that load() would cause
+  const refreshTask = useCallback(async (id: number) => {
+    try {
+      setTask(await api.get<TaskDto>(`/tasks/${id}`))
+    } catch {
+      // keep stale total on failure
+    }
+  }, [])
+
+  function handleTimeChanged() {
+    if (activeId !== null) refreshTask(activeId)
+    onChanged?.()
+  }
 
   return (
     <Drawer open={open} onClose={onClose} title={task?.title ?? 'Task'}>
@@ -112,7 +133,7 @@ export default function TaskDrawer({
                   workspaces.find((w) => w.id === project?.workspaceId)?.role ?? '',
                 )
               }
-              onChanged={onChanged}
+              onChanged={handleTimeChanged}
             />
           </Card>
           <Card title="Comments">

@@ -1,4 +1,4 @@
-import { TagDto } from '../pages/projectTypes'
+import { safeCssColor, TagDto } from '../pages/projectTypes'
 
 export default function TagBadges({ tags }: { tags: TagDto[] | undefined }) {
   if (!tags || tags.length === 0) return null
@@ -8,7 +8,7 @@ export default function TagBadges({ tags }: { tags: TagDto[] | undefined }) {
         <span key={t.id} className="tag-badge">
           <span
             className="tag-dot"
-            style={{ background: t.color ?? 'var(--muted)' }}
+            style={{ background: safeCssColor(t.color) ?? 'var(--muted)' }}
             aria-hidden="true"
           />
           {t.title}

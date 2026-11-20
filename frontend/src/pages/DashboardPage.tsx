@@ -14,7 +14,7 @@ import Card from '../components/Card'
 import PageHeader from '../components/PageHeader'
 import StatCard from '../components/StatCard'
 import TagBadges from '../components/TagBadges'
-import { formatMinutes } from './projectTypes'
+import { formatMinutes, safeCssColor } from './projectTypes'
 import { useShell } from '../shell/ShellContext'
 import { ProjectDto, statusLabel } from './projectTypes'
 import { WorkspaceSummaryDto } from './workspaceTypes'
@@ -174,7 +174,7 @@ export default function DashboardPage() {
                     {p.color && (
                       <span
                         className="project-swatch"
-                        style={{ background: p.color }}
+                        style={{ background: safeCssColor(p.color) }}
                         aria-hidden="true"
                       />
                     )}

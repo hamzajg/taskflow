@@ -1,8 +1,8 @@
 # Delivery Loop — create-pane
 
-Status: running
+Status: done
 Iterations: 0
-Updated: 2026-11-20T07:43:41Z
+Updated: 2026-11-20T07:46:16Z
 
 | Wave | Status | Branch | PR | Evidence | Updated |
 |------|--------|--------|----|----------|---------|
@@ -25,3 +25,4 @@ Updated: 2026-11-20T07:43:41Z
 - 2026-11-20T07:39:39Z complete wave 2 (#33): vitest 83/83, build clean, Playwright walkthrough: projects page + project drawer + created project listed
 - 2026-11-20T07:42:45Z start wave 3 on feat/create-pane-w3
 - 2026-11-20T07:43:41Z complete wave 3 (#34): vitest 85/85, build clean, a11y scenario tests + both-theme screenshots
+- 2026-11-20T07:46:16Z feature validated and shipped

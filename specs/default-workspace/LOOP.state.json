@@ -2,14 +2,14 @@
   "feature": "default-workspace",
   "status": "running",
   "iterations": 0,
-  "updated": "2026-11-20T08:54:57Z",
+  "updated": "2026-11-20T09:02:10Z",
   "waves": {
     "1": {
-      "status": "in-progress",
+      "status": "done",
       "branch": "feat/default-workspace-w1",
-      "pr": "\u2014",
-      "evidence": "\u2014",
-      "updated": "2026-11-20T08:54:57Z"
+      "pr": "#42",
+      "evidence": "backend 48/48 (8 new DefaultWorkspaceTest), frontend 103/103 + build, evidence 20261120T090124Z-76bfaa7 verified",
+      "updated": "2026-11-20T09:02:10Z"
     }
   },
   "gates": {
@@ -21,6 +21,7 @@
   },
   "events": [
     "2026-11-20T08:45:52Z gate G1 met: specs/default-workspace/DECISION-REVIEW.md (challenger REVISE \u2192 all 6 findings folded; post-fold ACCEPT)",
-    "2026-11-20T08:54:57Z start wave 1 on feat/default-workspace-w1"
+    "2026-11-20T08:54:57Z start wave 1 on feat/default-workspace-w1",
+    "2026-11-20T09:02:10Z complete wave 1 (#42): backend 48/48 (8 new DefaultWorkspaceTest), frontend 103/103 + build, evidence 20261120T090124Z-76bfaa7 verified"
   ]
 }

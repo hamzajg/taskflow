@@ -95,22 +95,27 @@ describe('Account page — "Account management remains reachable"', () => {
     localStorage.clear()
   })
 
-  it('keeps workspace management and profile editing at /account', async () => {
+  it('keeps workspace management at /account and profile editing at /profile', async () => {
     renderAt('/account')
     expect((await screen.findAllByText('Acme')).length).toBeGreaterThan(0)
     expect(document.getElementById('workspaces')).toBeTruthy()
-    expect(document.getElementById('profile')).toBeTruthy()
-    expect(screen.getByLabelText(/first name/i)).toBeTruthy()
+    expect(document.getElementById('profile')).toBeNull()
+    expect(screen.queryByLabelText(/first name/i)).toBeNull()
+
+    cleanup()
+    renderAt('/profile')
+    expect(await screen.findByLabelText(/first name/i)).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Save profile' })).toBeTruthy()
   })
 
-  it('sidebar links point to dashboard, projects and account anchors', async () => {
+  it('sidebar links point to dashboard, projects, account and profile', async () => {
     renderAt('/account')
     await screen.findAllByText('Acme')
     const nav = document.querySelector('.sidebar-nav')!
     const hrefs = Array.from(nav.querySelectorAll('a')).map((a) => a.getAttribute('href'))
     expect(hrefs).toContain('/dashboard')
     expect(hrefs).toContain('/projects')
-    expect(hrefs).toContain('/account#workspaces')
-    expect(hrefs).toContain('/account#profile')
+    expect(hrefs).toContain('/account')
+    expect(hrefs).toContain('/profile')
   })
 })

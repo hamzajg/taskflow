@@ -1,8 +1,8 @@
 {
   "feature": "home-landing",
   "status": "running",
-  "iterations": 0,
-  "updated": "2026-11-20T05:34:03Z",
+  "iterations": 1,
+  "updated": "2026-11-20T05:40:04Z",
   "waves": {
     "1": {
       "status": "done",
@@ -12,11 +12,11 @@
       "updated": "2026-11-20T05:17:10Z"
     },
     "2": {
-      "status": "in-progress",
+      "status": "done",
       "branch": "feat/home-landing-w2",
-      "pr": "\u2014",
-      "evidence": "\u2014",
-      "updated": "2026-11-20T05:34:03Z"
+      "pr": "#25",
+      "evidence": "summary API + dashboard widgets; backend mvn green, vitest 44/44, build clean, evidence 20261120T053807Z-ff7b93e verifie",
+      "updated": "2026-11-20T05:40:03Z"
     }
   },
   "gates": {
@@ -30,6 +30,7 @@
     "2026-11-20T05:10:36Z gate G1 met: specs/home-landing/DECISION-REVIEW.md (verdict REVISE, all findings folded into SPEC.md; spec audit PASS)",
     "2026-11-20T05:10:36Z start wave 1 on feat/home-landing-w1",
     "2026-11-20T05:17:10Z complete wave 1 (#24): vitest 40/40, build clean, 4 playwright screenshots; evidence 20261120T051645Z-cd563fb",
-    "2026-11-20T05:34:03Z start wave 2 on feat/home-landing-w2"
+    "2026-11-20T05:34:03Z start wave 2 on feat/home-landing-w2",
+    "2026-11-20T05:40:03Z complete wave 2 (#25): summary API + dashboard widgets; backend mvn green, vitest 44/44, build clean, evidence 20261120T053807Z-ff7b93e verifie"
   ]
 }

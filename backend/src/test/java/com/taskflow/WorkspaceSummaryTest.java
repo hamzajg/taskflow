@@ -2,6 +2,7 @@ package com.taskflow;
 
 import com.taskflow.model.Project;
 import com.taskflow.model.Task;
+import com.taskflow.model.TimeEntry;
 import com.taskflow.model.User;
 import com.taskflow.model.Workspace;
 import com.taskflow.model.WorkspaceInvite;
@@ -35,6 +36,7 @@ public class WorkspaceSummaryTest {
     @Transactional
     void clearMail() {
         mailbox.clear();
+        TimeEntry.deleteAll();
         Task.deleteAll();
         Project.deleteAll();
         WorkspaceInvite.deleteAll();
@@ -97,10 +99,18 @@ public class WorkspaceSummaryTest {
                 .extract().path("id")).longValue();
     }
 
-    private void createTask(String auth, long projectId, String body) {
-        given().header("Authorization", auth).contentType(ContentType.JSON)
+    private long createTask(String auth, long projectId, String body) {
+        return ((Number) given().header("Authorization", auth).contentType(ContentType.JSON)
                 .body(body)
                 .when().post("/projects/" + projectId + "/tasks")
+                .then().statusCode(201)
+                .extract().path("id")).longValue();
+    }
+
+    private void logTime(String auth, long taskId, int minutes) {
+        given().header("Authorization", auth).contentType(ContentType.JSON)
+                .body("{\"entryDate\":\"" + LocalDate.now() + "\",\"minutes\":" + minutes + "}")
+                .when().post("/tasks/" + taskId + "/time-entries")
                 .then().statusCode(201);
     }
 
@@ -192,6 +202,30 @@ public class WorkspaceSummaryTest {
         given().header("Authorization", strangerAuth)
                 .when().get("/workspaces/999999/summary")
                 .then().statusCode(404);
+    }
+
+    // Scenario: Dashboard shows project identity and time totals (ux-polish US1)
+    @Test
+    public void summary_includes_workspace_time_total() {
+        Response owner = registerVerifyLogin("s6@example.com", "Tim", "Er");
+        String auth = bearer(owner);
+        long wsId = createWorkspace(auth, "Time WS");
+        long projectId = createProject(auth, wsId, "Proj");
+        long taskA = createTask(auth, projectId, "{\"title\":\"task A\",\"status\":\"todo\"}");
+        long taskB = createTask(auth, projectId, "{\"title\":\"task B\",\"status\":\"todo\"}");
+
+        logTime(auth, taskA, 45);
+        logTime(auth, taskB, 30);
+
+        // A running timer contributes 0 (minutes NULL) until stopped.
+        given().header("Authorization", auth).contentType(ContentType.JSON).body("{}")
+                .when().post("/tasks/" + taskA + "/time-entries/timer/start")
+                .then().statusCode(201);
+
+        given().header("Authorization", auth)
+                .when().get("/workspaces/" + wsId + "/summary")
+                .then().statusCode(200)
+                .body("timeMinutesTotal", equalTo(75));
     }
 
     // Cross-workspace isolation: counts only reflect the path workspace

@@ -61,6 +61,7 @@ public final class AuthDtos {
             Map<String, Long> tasksByStatus,
             long overdueCount,
             long dueSoonCount,
-            long myOpenTaskCount) {
+            long myOpenTaskCount,
+            long timeMinutesTotal) {
     }
 }

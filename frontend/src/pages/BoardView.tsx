@@ -1,4 +1,4 @@
-import { DragEvent, FormEvent, useState } from 'react'
+import { DragEvent, FormEvent, MouseEvent, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Badge from '../components/Badge'
 import Button from '../components/Button'
@@ -19,9 +19,11 @@ interface DropTarget {
 export default function BoardView({
   tasks,
   onMove,
+  onTaskClick,
 }: {
   tasks: TaskDto[]
   onMove: (taskId: number, status: string, position: number) => void
+  onTaskClick?: (e: MouseEvent, taskId: number) => void
 }) {
   const [dragId, setDragId] = useState<number | null>(null)
   const [drop, setDrop] = useState<DropTarget | null>(null)
@@ -140,7 +142,12 @@ export default function BoardView({
                     <>
                       <div className="task-main">
                         <strong>
-                          <Link to={`/tasks/${t.id}`}>{t.title}</Link>
+                          <Link
+                            to={`/tasks/${t.id}`}
+                            onClick={(e) => onTaskClick?.(e, t.id)}
+                          >
+                            {t.title}
+                          </Link>
                         </strong>
                         {t.description && (
                           <p className="muted task-desc">{t.description}</p>

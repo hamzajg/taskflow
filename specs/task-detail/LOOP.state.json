@@ -1,8 +1,8 @@
 {
   "feature": "task-detail",
-  "status": "running",
+  "status": "done",
   "iterations": 3,
-  "updated": "2026-11-20T04:47:09Z",
+  "updated": "2026-11-20T04:50:56Z",
   "waves": {
     "1": {
       "status": "done",
@@ -40,6 +40,7 @@
     "2026-11-20T04:13:24Z start wave 2 on feat/task-detail-w2",
     "2026-11-20T04:17:13Z complete wave 2 (#21): vitest 32/32, build clean, playwright screenshots verified; evidence 20261120T041633Z-66d46ab",
     "2026-11-20T04:45:44Z start wave 3 on feat/task-detail-w3",
-    "2026-11-20T04:47:07Z complete wave 3 (#22): vitest 35/35, build clean, both-theme screenshots; evidence 20261120T044633Z-13060f1"
+    "2026-11-20T04:47:07Z complete wave 3 (#22): vitest 35/35, build clean, both-theme screenshots; evidence 20261120T044633Z-13060f1",
+    "2026-11-20T04:50:56Z feature validated and shipped"
   ]
 }

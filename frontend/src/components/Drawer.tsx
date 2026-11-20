@@ -53,6 +53,10 @@ export default function Drawer({
   // focus panel on open + lock body scroll
   useEffect(() => {
     if (mounted && open) {
+      // capture the invoker even when the drawer mounts already-open
+      if (!restoreRef.current) {
+        restoreRef.current = document.activeElement as HTMLElement | null
+      }
       panelRef.current?.focus()
       const prev = document.body.style.overflow
       document.body.style.overflow = 'hidden'

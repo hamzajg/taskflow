@@ -22,8 +22,9 @@ export default function WorkspacePanel({
 }) {
   const [openId, setOpenId] = useState<number | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
+  // keep the last opened workspace so the drawer can animate closed
+  const [drawerWs, setDrawerWs] = useState<WorkspaceDto | null>(null)
   const { setActiveWorkspaceId } = useShell()
-  const openWs = workspaces.find((w) => w.id === openId)
 
   return (
     <Card
@@ -41,6 +42,7 @@ export default function WorkspacePanel({
               variant="link"
               onClick={() => {
                 setOpenId(w.id)
+                setDrawerWs(w)
                 setActiveWorkspaceId(w.id)
               }}
             >
@@ -54,9 +56,9 @@ export default function WorkspacePanel({
         ))}
       </ul>
 
-      {openWs && (
+      {drawerWs && (
         <WorkspaceDrawer
-          workspace={openWs}
+          workspace={drawerWs}
           open={openId !== null}
           onClose={() => setOpenId(null)}
           onChanged={onChanged}

@@ -46,8 +46,25 @@ describe('SRP — "CommentThread is shared, not duplicated" (@w2)', () => {
   })
 
   it('single-responsibility components exist', () => {
-    for (const name of ['TaskFormFields', 'TaskItem', 'ViewToggle', 'Drawer', 'CommentThread', 'PageHeader', 'StatCard']) {
+    for (const name of ['TaskFormFields', 'TaskItem', 'ViewToggle', 'Drawer', 'CommentThread', 'PageHeader', 'StatCard', 'ProfileForm']) {
       expect(() => read(`components/${name}.tsx`)).not.toThrow()
     }
+  })
+})
+
+describe('SRP — "AccountPage delegates profile editing to ProfileForm" (@w3)', () => {
+  it('AccountPage contains no form markup or profile submit logic', () => {
+    const page = read('pages/AccountPage.tsx')
+    expect(page).not.toContain('<form')
+    expect(page).not.toContain('api.put')
+    expect(page).toContain('components/ProfileForm')
+  })
+
+  it('ProfileForm owns fields, submit, pending state and messages', () => {
+    const form = read('components/ProfileForm.tsx')
+    expect(form).toContain('<form')
+    expect(form).toContain('/auth/profile')
+    expect(form).toContain('Save profile')
+    expect(form).toContain('pending')
   })
 })

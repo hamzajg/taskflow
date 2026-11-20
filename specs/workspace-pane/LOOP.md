@@ -2,13 +2,13 @@
 
 Status: running
 Iterations: 0
-Updated: 2026-11-20T08:17:53Z
+Updated: 2026-11-20T08:20:49Z
 
 | Wave | Status | Branch | PR | Evidence | Updated |
 |------|--------|--------|----|----------|---------|
 | 1 | done | feat/workspace-pane-w1 | #38 | vitest 95/95, build clean, Playwright: ws drawer light+dark, members/invites/rename/delete flows | 2026-11-20T08:12:34Z |
 | 2 | done | feat/workspace-pane-w2 | #39 | vitest 99/99, build clean, Playwright: clean account page + create drawer + created workspace | 2026-11-20T08:17:53Z |
-| 3 | pending | — | — | — | — |
+| 3 | in-progress | feat/workspace-pane-w3 | — | — | 2026-11-20T08:20:49Z |
 
 ## Gates
 
@@ -23,3 +23,4 @@ Updated: 2026-11-20T08:17:53Z
 - 2026-11-20T08:12:34Z complete wave 1 (#38): vitest 95/95, build clean, Playwright: ws drawer light+dark, members/invites/rename/delete flows
 - 2026-11-20T08:16:42Z start wave 2 on feat/workspace-pane-w2
 - 2026-11-20T08:17:53Z complete wave 2 (#39): vitest 99/99, build clean, Playwright: clean account page + create drawer + created workspace
+- 2026-11-20T08:20:49Z start wave 3 on feat/workspace-pane-w3

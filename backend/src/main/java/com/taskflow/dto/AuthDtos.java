@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.util.Map;
+
 public final class AuthDtos {
 
     private AuthDtos() {
@@ -50,5 +52,15 @@ public final class AuthDtos {
     }
 
     public record InviteDto(long id, String email, String role, String token) {
+    }
+
+    /** GET /workspaces/{id}/summary — dashboard aggregate (home-landing D2). */
+    public record WorkspaceSummaryDto(
+            long projectCount,
+            long memberCount,
+            Map<String, Long> tasksByStatus,
+            long overdueCount,
+            long dueSoonCount,
+            long myOpenTaskCount) {
     }
 }

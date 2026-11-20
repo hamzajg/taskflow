@@ -3,6 +3,9 @@ package com.taskflow.service;
 import com.taskflow.dto.AuthDtos.InviteDto;
 import com.taskflow.dto.AuthDtos.MemberDto;
 import com.taskflow.dto.AuthDtos.WorkspaceDto;
+import com.taskflow.dto.AuthDtos.WorkspaceSummaryDto;
+import com.taskflow.model.Project;
+import com.taskflow.model.Task;
 import com.taskflow.model.User;
 import com.taskflow.model.Workspace;
 import com.taskflow.model.WorkspaceInvite;
@@ -15,7 +18,9 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,6 +52,46 @@ public class WorkspaceService {
             throw new WebApplicationException("Not a member of this workspace", Response.Status.FORBIDDEN);
         }
         return new Membership(ws, m);
+    }
+
+    /**
+     * Dashboard aggregate for one workspace (home-landing D2).
+     * All task predicates are scoped to tasks.workspace_id; "open" means
+     * status != 'done'. due_date NULL never matches either window.
+     */
+    public WorkspaceSummaryDto summary(User user, Long workspaceId) {
+        requireMembership(workspaceId, user.id);
+        requireVerified(user);
+
+        long projectCount = Project.count("workspaceId", workspaceId);
+        long memberCount = WorkspaceMember.count("workspaceId", workspaceId);
+
+        Map<String, Long> byStatus = new HashMap<>();
+        for (String s : Task.STATUS_ORDER) {
+            byStatus.put(s, 0L);
+        }
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = Task.getEntityManager().createQuery(
+                        "select status, count(id) from Task where workspaceId = ?1 group by status")
+                .setParameter(1, workspaceId)
+                .getResultList();
+        for (Object[] row : rows) {
+            byStatus.put((String) row[0], (Long) row[1]);
+        }
+
+        LocalDate today = LocalDate.now();
+        long overdue = Task.count(
+                "workspaceId = ?1 and status <> ?2 and dueDate is not null and dueDate < ?3",
+                workspaceId, Task.STATUS_DONE, today);
+        long dueSoon = Task.count(
+                "workspaceId = ?1 and status <> ?2 and dueDate >= ?3 and dueDate <= ?4",
+                workspaceId, Task.STATUS_DONE, today, today.plusDays(7));
+        long myOpen = Task.count(
+                "workspaceId = ?1 and assigneeId = ?2 and status <> ?3",
+                workspaceId, user.id, Task.STATUS_DONE);
+
+        return new WorkspaceSummaryDto(projectCount, memberCount, byStatus,
+                overdue, dueSoon, myOpen);
     }
 
     public void requireVerified(User user) {

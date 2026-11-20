@@ -6,6 +6,7 @@ import com.taskflow.dto.AuthDtos.WorkspaceDto;
 import com.taskflow.dto.AuthDtos.WorkspaceSummaryDto;
 import com.taskflow.model.Project;
 import com.taskflow.model.Task;
+import com.taskflow.model.TimeEntry;
 import com.taskflow.model.User;
 import com.taskflow.model.Workspace;
 import com.taskflow.model.WorkspaceInvite;
@@ -90,8 +91,15 @@ public class WorkspaceService {
                 "workspaceId = ?1 and assigneeId = ?2 and status <> ?3",
                 workspaceId, user.id, Task.STATUS_DONE);
 
+        // SUM ignores NULL minutes, so running timers contribute 0.
+        Long minutes = TimeEntry.getEntityManager().createQuery(
+                        "select coalesce(sum(minutes), 0) from TimeEntry where workspaceId = ?1",
+                        Long.class)
+                .setParameter(1, workspaceId)
+                .getSingleResult();
+
         return new WorkspaceSummaryDto(projectCount, memberCount, byStatus,
-                overdue, dueSoon, myOpen);
+                overdue, dueSoon, myOpen, minutes);
     }
 
     public void requireVerified(User user) {

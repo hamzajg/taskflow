@@ -39,10 +39,12 @@ public final class ProjectDtos {
             String assigneeName,
             LocalDate dueDate,
             int position,
+            long totalMinutes,
             Instant createdAt) {
-        public static TaskDto of(Task t, String assigneeName) {
+        public static TaskDto of(Task t, String assigneeName, long totalMinutes) {
             return new TaskDto(t.id, t.projectId, t.title, t.description, t.status,
-                    t.priority, t.assigneeId, assigneeName, t.dueDate, t.position, t.createdAt);
+                    t.priority, t.assigneeId, assigneeName, t.dueDate, t.position,
+                    totalMinutes, t.createdAt);
         }
     }
 

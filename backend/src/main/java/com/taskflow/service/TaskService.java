@@ -30,6 +30,9 @@ public class TaskService {
     @Inject
     WorkspaceService workspaceService;
 
+    @Inject
+    TimeEntryService timeEntryService;
+
     private static WebApplicationException badRequest(String msg) {
         return new WebApplicationException(msg, Response.Status.BAD_REQUEST);
     }
@@ -82,8 +85,11 @@ public class TaskService {
                 names.put(u.id, u.displayName());
             }
         }
+        Map<Long, Long> totals = timeEntryService.totalsForTasks(
+                tasks.stream().map(t -> t.id).toList());
         return tasks.stream()
-                .map(t -> TaskDto.of(t, t.assigneeId == null ? null : names.get(t.assigneeId)))
+                .map(t -> TaskDto.of(t, t.assigneeId == null ? null : names.get(t.assigneeId),
+                        totals.getOrDefault(t.id, 0L)))
                 .toList();
     }
 

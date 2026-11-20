@@ -1,12 +1,12 @@
-import { FormEvent, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, ApiError } from '../api'
 import Alert from '../components/Alert'
 import Badge from '../components/Badge'
 import Button from '../components/Button'
 import Card from '../components/Card'
-import Input from '../components/Input'
 import PageHeader from '../components/PageHeader'
+import ProjectCreateDrawer from './ProjectCreateDrawer'
 import { useShell } from '../shell/ShellContext'
 import { ProjectDto } from './projectTypes'
 
@@ -18,10 +18,7 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<ProjectDto[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [color, setColor] = useState('')
-  const [formError, setFormError] = useState('')
+  const [createOpen, setCreateOpen] = useState(false)
 
   const load = useCallback(async () => {
     if (workspaceId === null) return
@@ -41,25 +38,6 @@ export default function ProjectsPage() {
     load()
   }, [load])
 
-  async function create(e: FormEvent) {
-    e.preventDefault()
-    if (workspaceId === null) return
-    setFormError('')
-    try {
-      await api.post(`/workspaces/${workspaceId}/projects`, {
-        name,
-        description: description || undefined,
-        color: color || undefined,
-      })
-      setName('')
-      setDescription('')
-      setColor('')
-      await load()
-    } catch (err) {
-      setFormError(err instanceof ApiError ? err.message : 'Create failed')
-    }
-  }
-
   return (
     <>
       <PageHeader title="Projects" />
@@ -73,9 +51,14 @@ export default function ProjectsPage() {
         <Card
           title="Projects"
           actions={
-            <span className="muted">
-              {workspaces.find((w) => w.id === workspaceId)?.name}
-            </span>
+            <>
+              <span className="muted">
+                {workspaces.find((w) => w.id === workspaceId)?.name}
+              </span>
+              <Button size="sm" onClick={() => setCreateOpen(true)}>
+                New project
+              </Button>
+            </>
           }
         >
           {error && (
@@ -86,30 +69,6 @@ export default function ProjectsPage() {
               </Button>
             </Alert>
           )}
-          {formError && <Alert>{formError}</Alert>}
-
-          <form className="inline-form" onSubmit={create}>
-            <Input
-              label="Name"
-              placeholder="Project name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-            <Input
-              label="Description"
-              placeholder="Optional"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-            <Input
-              label="Color"
-              placeholder="#rrggbb"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-            />
-            <Button type="submit">Create project</Button>
-          </form>
 
           {loading && (
             <p className="muted" role="status">
@@ -117,7 +76,7 @@ export default function ProjectsPage() {
             </p>
           )}
           {!loading && projects && projects.length === 0 && (
-            <p className="muted">No projects yet — create the first one above.</p>
+            <p className="muted">No projects yet — use “New project” to create the first one.</p>
           )}
           {!loading && projects && projects.length > 0 && (
             <ul className="ws-list project-list">
@@ -142,6 +101,14 @@ export default function ProjectsPage() {
             </ul>
           )}
         </Card>
+      )}
+      {workspaceId !== null && (
+        <ProjectCreateDrawer
+          open={createOpen}
+          workspaceId={workspaceId}
+          onClose={() => setCreateOpen(false)}
+          onCreated={load}
+        />
       )}
     </>
   )

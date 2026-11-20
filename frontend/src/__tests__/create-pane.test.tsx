@@ -259,11 +259,121 @@ describe('create-pane — "Only one drawer is open at a time" (@w1)', () => {
       expect(dialogs.some((d) => d.textContent?.includes('Create task'))).toBe(true)
     })
     // at most one OPEN drawer — a closing peek may linger in the DOM briefly
-    const openDialogs = screen
-      .getAllByRole('dialog')
-      .filter((d) => d.closest('.drawer')?.classList.contains('drawer-open'))
-    expect(openDialogs.length).toBe(1)
-    expect(openDialogs[0].textContent).toContain('Create task')
+    await waitFor(() => {
+      const openDialogs = screen
+        .getAllByRole('dialog')
+        .filter((d) => d.closest('.drawer')?.classList.contains('drawer-open'))
+      expect(openDialogs.length).toBe(1)
+      expect(openDialogs[0].textContent).toContain('Create task')
+    })
+  })
+})
+
+describe('create-pane — "New project opens the creation drawer" (@w2)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('opens a labelled dialog with name, description and color fields', async () => {
+    renderAt('/projects')
+    await screen.findByText('Website redesign')
+    fireEvent.click(screen.getByRole('button', { name: 'New project' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog as HTMLElement).getByLabelText(/name/i)).toBeTruthy()
+    expect(within(dialog as HTMLElement).getByLabelText(/description/i)).toBeTruthy()
+    expect(within(dialog as HTMLElement).getByLabelText(/color/i)).toBeTruthy()
+    expect(
+      within(dialog as HTMLElement).getByRole('button', { name: 'Create project' }),
+    ).toBeTruthy()
+  })
+})
+
+describe('create-pane — "Creating a project closes the drawer and updates the list" (@w2)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    let projects: unknown[] = [PROJECT_5]
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input)
+        const routes: Record<string, unknown> = {
+          '/auth/me': USER,
+          '/workspaces': [WORKSPACE],
+        }
+        if (url === '/workspaces/1/projects') {
+          if (init?.method === 'POST') {
+            const body = JSON.parse(String(init.body))
+            const created = { ...PROJECT_5, id: 7, taskCount: 0, ...body }
+            projects = [...projects, created]
+            return Promise.resolve(jsonResponse(created, 201))
+          }
+          return Promise.resolve(jsonResponse(projects))
+        }
+        if (url in routes) return Promise.resolve(jsonResponse(routes[url]))
+        return Promise.resolve(jsonResponse({ message: 'not found' }, 404))
+      }),
+    )
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('posts the project, omits empty optional fields, closes and lists it', async () => {
+    const fetchMock = vi.mocked(globalThis.fetch)
+    renderAt('/projects')
+    await screen.findByText('Website redesign')
+    fireEvent.click(screen.getByRole('button', { name: 'New project' }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.change(within(dialog as HTMLElement).getByLabelText(/name/i), {
+      target: { value: 'Second project' },
+    })
+    fireEvent.click(
+      within(dialog as HTMLElement).getByRole('button', { name: 'Create project' }),
+    )
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    expect(await screen.findByText('Second project')).toBeTruthy()
+    // empty optional fields are omitted from the request body
+    const post = fetchMock.mock.calls.find(
+      ([u, i]) =>
+        String(u) === '/workspaces/1/projects' && i?.method === 'POST',
+    )
+    const body = JSON.parse(String(post?.[1]?.body))
+    expect(body.name).toBe('Second project')
+    expect(body).not.toHaveProperty('description')
+    expect(body).not.toHaveProperty('color')
+  })
+})
+
+describe('create-pane — "Inline creation forms are gone" (@w2)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('project and project-detail pages render no permanent create forms', async () => {
+    const { container, unmount } = renderAt('/projects')
+    await screen.findByText('Website redesign')
+    expect(container.querySelector('form.inline-form')).toBeNull()
+    expect(screen.queryByLabelText(/^name$/i)).toBeNull()
+    unmount()
+
+    renderAt('/projects/5')
+    await screen.findByRole('link', { name: 'Write copy' })
+    expect(document.querySelector('form.task-form')).toBeNull()
+    expect(screen.queryByLabelText(/^title$/i)).toBeNull()
   })
 })
 

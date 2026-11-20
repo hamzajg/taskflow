@@ -1,0 +1,17 @@
+{
+  "feature": "profile-page",
+  "status": "running",
+  "iterations": 0,
+  "updated": "2026-11-20T10:05:40Z",
+  "waves": {},
+  "gates": {
+    "G1": {
+      "status": "met",
+      "evidence": "specs/profile-page/DECISION-REVIEW.md (challenger REVISE \u2192 all 5 findings folded; post-fold ACCEPT)",
+      "updated": "2026-11-20T10:05:40Z"
+    }
+  },
+  "events": [
+    "2026-11-20T10:05:40Z gate G1 met: specs/profile-page/DECISION-REVIEW.md (challenger REVISE \u2192 all 5 findings folded; post-fold ACCEPT)"
+  ]
+}

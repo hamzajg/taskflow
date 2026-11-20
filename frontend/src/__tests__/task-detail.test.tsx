@@ -220,3 +220,84 @@ describe('Task detail — "Task with no comments shows an empty state"', () => {
     expect(screen.queryByText(/error/i)).toBeNull()
   })
 })
+
+describe('Task detail — "Loading and error states are handled"', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('shows an error alert with retry when the task fails to load', async () => {
+    let fail = true
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) => {
+        const url = String(input)
+        if (url === '/tasks/11') {
+          if (fail) {
+            fail = false
+            return Promise.resolve(
+              jsonResponse({ message: 'boom' }, 500),
+            )
+          }
+          return Promise.resolve(jsonResponse(TASK))
+        }
+        if (url === '/projects/5') return Promise.resolve(jsonResponse(PROJECT))
+        if (url === '/tasks/11/comments') {
+          return Promise.resolve(jsonResponse({ comments: [], hasMore: false }))
+        }
+        if (url === '/auth/me') return Promise.resolve(jsonResponse(USER))
+        if (url === '/workspaces') return Promise.resolve(jsonResponse([WORKSPACE]))
+        return Promise.resolve(jsonResponse({ message: 'not found' }, 404))
+      }),
+    )
+    renderAt('/tasks/11')
+    const alert = await screen.findByRole('alert')
+    expect(alert.textContent).toContain('boom')
+    fireEvent.click(screen.getByRole('button', { name: /retry/i }))
+    expect(await screen.findByText('Write launch copy')).toBeTruthy()
+  })
+
+  it('shows a loading indicator while the task is being fetched', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>(() => {})),
+    )
+    renderAt('/tasks/11')
+    expect(await screen.findByRole('status')).toBeTruthy()
+  })
+})
+
+describe('Task detail — "Detail and comments screens meet the accessibility bar"', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockApi()
+  })
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('labels every comment control and exposes the thread accessibly', async () => {
+    renderAt('/tasks/11')
+    await screen.findByText('Draft is in the doc')
+    // post form: labelled textarea + named button
+    expect(screen.getByLabelText(/add a comment/i)).toBeTruthy()
+    expect(screen.getByRole('button', { name: /post comment/i })).toBeTruthy()
+    // author controls on own comment only
+    const own = screen.getByText('Looks good, ship it').closest('li') as HTMLElement
+    expect(within(own).getByRole('button', { name: /^edit$/i })).toBeTruthy()
+    expect(within(own).getByRole('button', { name: /^delete$/i })).toBeTruthy()
+    const other = screen.getByText('Draft is in the doc').closest('li') as HTMLElement
+    expect(within(other).queryByRole('button', { name: /^edit$/i })).toBeNull()
+    // edit form exposes a labelled field when opened
+    fireEvent.click(within(own).getByRole('button', { name: /^edit$/i }))
+    expect(within(own).getByLabelText(/^comment$/i)).toBeTruthy()
+    expect(within(own).getByRole('button', { name: /^save$/i })).toBeTruthy()
+  })
+})

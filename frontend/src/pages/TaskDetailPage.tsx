@@ -109,7 +109,19 @@ export default function TaskDetailPage() {
     )
   }
   if (error || !task) {
-    return <Alert>{error || 'Task not found'}</Alert>
+    return (
+      <>
+        <p>
+          <Link to="/projects">← Projects</Link>
+        </p>
+        <Alert>
+          {error || 'Task not found'}{' '}
+          <Button variant="link" size="sm" onClick={load}>
+            Retry
+          </Button>
+        </Alert>
+      </>
+    )
   }
 
   return (
@@ -153,7 +165,7 @@ export default function TaskDetailPage() {
         ) : comments.length === 0 ? (
           <p className="muted">No comments yet — start the discussion below.</p>
         ) : (
-          <ul className="comment-list">
+          <ul className="comment-list" aria-live="polite">
             {comments.map((c) => (
               <li key={c.id} className="comment-item">
                 {editingId === c.id ? (

@@ -58,6 +58,7 @@ function mockApi() {
     '/workspaces/1/members': [],
     '/tasks/11': TASK_11,
     '/tasks/11/comments': { comments: [], hasMore: false },
+    '/tasks/11/time-entries': { entries: [], running: null },
   }
   vi.stubGlobal(
     'fetch',

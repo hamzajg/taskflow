@@ -26,7 +26,28 @@ export interface TaskDto {
   assigneeName: string | null
   dueDate: string | null
   position: number
+  totalMinutes: number
   createdAt: string
+}
+
+export interface TimeEntryDto {
+  id: number
+  taskId: number
+  taskTitle: string | null
+  userId: number
+  userName: string | null
+  entryDate: string
+  minutes: number | null
+  startedAt: string | null
+  endedAt: string | null
+  running: boolean
+  description: string | null
+  createdAt: string
+}
+
+export interface TimeEntryList {
+  entries: TimeEntryDto[]
+  running: TimeEntryDto | null
 }
 
 export interface CommentDto {

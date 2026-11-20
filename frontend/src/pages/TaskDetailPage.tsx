@@ -7,11 +7,21 @@ import Button from '../components/Button'
 import Card from '../components/Card'
 import CommentThread from '../components/CommentThread'
 import PageHeader from '../components/PageHeader'
+import TimeSection from '../components/TimeSection'
+import { useShell } from '../shell/ShellContext'
 import { priorityTone, ProjectDto, statusLabel, TaskDto } from './projectTypes'
+
+function formatTotal(minutes: number): string {
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  if (h === 0) return `${m}m`
+  return m === 0 ? `${h}h` : `${h}h ${m}m`
+}
 
 export default function TaskDetailPage() {
   const { id } = useParams<{ id: string }>()
   const taskId = Number(id)
+  const { workspaces } = useShell()
 
   const [task, setTask] = useState<TaskDto | null>(null)
   const [project, setProject] = useState<ProjectDto | null>(null)
@@ -36,6 +46,12 @@ export default function TaskDetailPage() {
   useEffect(() => {
     load()
   }, [load])
+
+  function canModerate(workspaceId: number | undefined): boolean {
+    if (workspaceId == null) return false
+    const ws = workspaces.find((w) => w.id === workspaceId)
+    return ws?.role === 'owner' || ws?.role === 'admin'
+  }
 
   if (loading) {
     return (
@@ -92,7 +108,18 @@ export default function TaskDetailPage() {
             <dt>Due date</dt>
             <dd>{task.dueDate ?? '—'}</dd>
           </div>
+          <div>
+            <dt>Time logged</dt>
+            <dd>{formatTotal(task.totalMinutes)}</dd>
+          </div>
         </dl>
+      </Card>
+
+      <Card
+        title="Time"
+        actions={<span className="muted">Total: {formatTotal(task.totalMinutes ?? 0)}</span>}
+      >
+        <TimeSection taskId={taskId} canModerate={canModerate(project?.workspaceId)} />
       </Card>
 
       <Card title="Comments">

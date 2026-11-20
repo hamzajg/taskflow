@@ -84,6 +84,8 @@ function mockApi(overrides: Record<string, unknown> = {}) {
     '/tasks/12': TASK_12,
     '/tasks/11/comments': COMMENTS,
     '/tasks/12/comments': { comments: [], hasMore: false },
+    '/tasks/11/time-entries': { entries: [], running: null },
+    '/tasks/12/time-entries': { entries: [], running: null },
     ...overrides,
   }
   vi.stubGlobal(

@@ -310,7 +310,7 @@ describe('Task drawer — "Board drag-and-drop still works" (@w1)', () => {
     const link = await screen.findByRole('link', { name: 'Write copy' })
     expect(link.getAttribute('href')).toBe('/tasks/11')
     // keyboard-accessible move path still present on every card
-    const moveButtons = screen.getAllByRole('button', { name: 'Move' })
+    const moveButtons = screen.getAllByRole('button', { name: /^Move "/ })
     expect(moveButtons.length).toBeGreaterThan(0)
     // card is still a drag source
     const card = link.closest('.board-card') as HTMLElement

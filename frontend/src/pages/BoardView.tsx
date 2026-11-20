@@ -167,6 +167,7 @@ export default function BoardView({
                       <Button
                         variant="link"
                         size="sm"
+                        aria-label={`Move "${t.title}"`}
                         onClick={() => {
                           setMoveFor(t.id)
                           setMoveStatus(status)

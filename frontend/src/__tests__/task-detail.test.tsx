@@ -177,7 +177,7 @@ describe('Task detail — "Comments thread renders and posting adds a comment"',
   it('posts a new comment through the form and appends it to the thread', async () => {
     renderAt('/tasks/11')
     await screen.findByText('Draft is in the doc')
-    fireEvent.change(screen.getByLabelText(/comment/i), {
+    fireEvent.change(screen.getByLabelText(/add a comment/i), {
       target: { value: 'Ship it Friday' },
     })
     fireEvent.click(screen.getByRole('button', { name: /post/i }))
@@ -189,7 +189,7 @@ describe('Task detail — "Comments thread renders and posting adds a comment"',
     await screen.findByText('Looks good, ship it')
     const own = screen.getByText('Looks good, ship it').closest('li')!
     fireEvent.click(within(own as HTMLElement).getByRole('button', { name: /edit/i }))
-    fireEvent.change(within(own as HTMLElement).getByLabelText(/comment/i), {
+    fireEvent.change(within(own as HTMLElement).getByLabelText(/^comment$/i), {
       target: { value: 'Looks great, ship it' },
     })
     fireEvent.click(within(own as HTMLElement).getByRole('button', { name: /save/i }))
@@ -291,12 +291,12 @@ describe('Task detail — "Detail and comments screens meet the accessibility ba
     expect(screen.getByRole('button', { name: /post comment/i })).toBeTruthy()
     // author controls on own comment only
     const own = screen.getByText('Looks good, ship it').closest('li') as HTMLElement
-    expect(within(own).getByRole('button', { name: /^edit$/i })).toBeTruthy()
-    expect(within(own).getByRole('button', { name: /^delete$/i })).toBeTruthy()
+    expect(within(own).getByRole('button', { name: 'Edit comment by Demo User' })).toBeTruthy()
+    expect(within(own).getByRole('button', { name: 'Delete comment by Demo User' })).toBeTruthy()
     const other = screen.getByText('Draft is in the doc').closest('li') as HTMLElement
-    expect(within(other).queryByRole('button', { name: /^edit$/i })).toBeNull()
+    expect(within(other).queryByRole('button', { name: /^edit comment by/i })).toBeNull()
     // edit form exposes a labelled field when opened
-    fireEvent.click(within(own).getByRole('button', { name: /^edit$/i }))
+    fireEvent.click(within(own).getByRole('button', { name: 'Edit comment by Demo User' }))
     expect(within(own).getByLabelText(/^comment$/i)).toBeTruthy()
     expect(within(own).getByRole('button', { name: /^save$/i })).toBeTruthy()
   })

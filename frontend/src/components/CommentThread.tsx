@@ -144,6 +144,7 @@ export default function CommentThread({ taskId }: { taskId: number }) {
                       <Button
                         variant="link"
                         size="sm"
+                        aria-label={`Edit comment by ${c.authorName}`}
                         onClick={() => {
                           setEditingId(c.id)
                           setEditBody(c.body)
@@ -154,6 +155,7 @@ export default function CommentThread({ taskId }: { taskId: number }) {
                       <Button
                         variant="link"
                         size="sm"
+                        aria-label={`Delete comment by ${c.authorName}`}
                         onClick={() => removeComment(c.id)}
                       >
                         Delete

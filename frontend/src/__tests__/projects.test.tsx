@@ -414,7 +414,7 @@ describe('Polish — "New screens meet the accessibility bar"', () => {
     renderAt('/projects/5')
     await screen.findByText('Write copy')
     const card = screen.getByText('Write copy').closest('li')!
-    expect(within(card as HTMLElement).getByRole('button', { name: /^move$/i })).toBeTruthy()
+    expect(within(card as HTMLElement).getByRole('button', { name: 'Move "Write copy"' })).toBeTruthy()
   })
 
   it('view toggle buttons expose pressed state', async () => {

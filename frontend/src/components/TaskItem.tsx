@@ -65,10 +65,20 @@ export default function TaskItem({
             </div>
           </div>
           <div className="task-actions">
-            <Button variant="link" size="sm" onClick={onStartEdit}>
+            <Button
+              variant="link"
+              size="sm"
+              aria-label={`Edit "${task.title}"`}
+              onClick={onStartEdit}
+            >
               Edit
             </Button>
-            <Button variant="link" size="sm" onClick={onDelete}>
+            <Button
+              variant="link"
+              size="sm"
+              aria-label={`Delete "${task.title}"`}
+              onClick={onDelete}
+            >
               Delete
             </Button>
           </div>

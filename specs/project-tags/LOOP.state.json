@@ -1,0 +1,17 @@
+{
+  "feature": "project-tags",
+  "status": "running",
+  "iterations": 1,
+  "updated": "2026-11-20T13:44:31Z",
+  "waves": {},
+  "gates": {
+    "G1": {
+      "status": "met",
+      "evidence": "specs/project-tags/DECISION-REVIEW.md",
+      "updated": "2026-11-20T13:44:25Z"
+    }
+  },
+  "events": [
+    "2026-11-20T13:44:25Z gate G1 met: specs/project-tags/DECISION-REVIEW.md"
+  ]
+}

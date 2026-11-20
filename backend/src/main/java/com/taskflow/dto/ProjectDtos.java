@@ -1,5 +1,6 @@
 package com.taskflow.dto;
 
+import com.taskflow.dto.TagDtos.TagDto;
 import com.taskflow.model.Project;
 import com.taskflow.model.Task;
 
@@ -19,10 +20,11 @@ public final class ProjectDtos {
             String description,
             String color,
             long taskCount,
+            List<TagDto> tags,
             Instant createdAt) {
-        public static ProjectDto of(Project p, long taskCount) {
+        public static ProjectDto of(Project p, long taskCount, List<TagDto> tags) {
             return new ProjectDto(p.id, p.workspaceId, p.name, p.description, p.color,
-                    taskCount, p.createdAt);
+                    taskCount, tags, p.createdAt);
         }
     }
 

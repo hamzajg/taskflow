@@ -1,6 +1,7 @@
 package com.taskflow.service;
 
 import com.taskflow.dto.ProjectDtos.ProjectDto;
+import com.taskflow.dto.TagDtos.TagDto;
 import com.taskflow.model.Project;
 import com.taskflow.model.Task;
 import com.taskflow.model.User;
@@ -24,6 +25,9 @@ public class ProjectService {
     @Inject
     WorkspaceService workspaceService;
 
+    @Inject
+    TagService tagService;
+
     public record ProjectRef(Project project, Membership membership) {
     }
 
@@ -43,15 +47,19 @@ public class ProjectService {
         List<Project> projects = Project.list("workspaceId = ?1 order by name", workspaceId);
         List<Long> ids = projects.stream().map(p -> p.id).toList();
         Map<Long, Long> counts = ids.isEmpty() ? Map.of() : Task.countGroupedByProject(ids);
+        Map<Long, List<TagDto>> tags = tagService.forProjects(ids);
         return projects.stream()
-                .map(p -> ProjectDto.of(p, counts.getOrDefault(p.id, 0L)))
+                .map(p -> ProjectDto.of(p, counts.getOrDefault(p.id, 0L),
+                        tags.getOrDefault(p.id, List.of())))
                 .toList();
     }
 
     @Transactional
-    public ProjectDto create(User user, Long workspaceId, String name, String description, String color) {
+    public ProjectDto create(User user, Long workspaceId, String name, String description, String color,
+                             List<Long> tagIds) {
         workspaceService.requireMembership(workspaceId, user.id);
         workspaceService.requireVerified(user);
+        tagService.requireTagsForWorkspace(workspaceId, tagIds);
         Project p = new Project();
         p.workspaceId = workspaceId;
         p.name = name.trim();
@@ -59,11 +67,13 @@ public class ProjectService {
         p.color = color;
         p.createdBy = user.id;
         p.persist();
-        return ProjectDto.of(p, 0);
+        tagService.setProjectTags(p, tagIds);
+        return ProjectDto.of(p, 0, tagIds == null ? List.of() : tagService.forProject(p.id));
     }
 
     @Transactional
-    public ProjectDto update(User user, Long projectId, String name, String description, String color) {
+    public ProjectDto update(User user, Long projectId, String name, String description, String color,
+                             List<Long> tagIds) {
         ProjectRef ref = requireProject(projectId, user.id);
         workspaceService.requireRole(ref.membership(),
                 WorkspaceMember.ROLE_OWNER, WorkspaceMember.ROLE_ADMIN);
@@ -78,7 +88,11 @@ public class ProjectService {
             p.color = color.isBlank() ? null : color;
         }
         p.updatedAt = Instant.now();
-        return ProjectDto.of(p, Task.count("projectId", p.id));
+        if (tagIds != null) {
+            tagService.requireTagsForWorkspace(p.workspaceId, tagIds);
+            tagService.setProjectTags(p, tagIds);
+        }
+        return ProjectDto.of(p, Task.count("projectId", p.id), tagService.forProject(p.id));
     }
 
     @Transactional

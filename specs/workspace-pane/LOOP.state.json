@@ -1,0 +1,27 @@
+{
+  "feature": "workspace-pane",
+  "status": "running",
+  "iterations": 0,
+  "updated": "2026-11-20T08:12:34Z",
+  "waves": {
+    "1": {
+      "status": "done",
+      "branch": "feat/workspace-pane-w1",
+      "pr": "#38",
+      "evidence": "vitest 95/95, build clean, Playwright: ws drawer light+dark, members/invites/rename/delete flows",
+      "updated": "2026-11-20T08:12:34Z"
+    }
+  },
+  "gates": {
+    "G1": {
+      "status": "met",
+      "evidence": "specs/workspace-pane/DECISION-REVIEW.md \u2014 REVISE, 9 findings folded; SPEC-AUDIT.md CONCERNS folded",
+      "updated": "2026-11-20T08:09:41Z"
+    }
+  },
+  "events": [
+    "2026-11-20T08:09:41Z gate G1 met: specs/workspace-pane/DECISION-REVIEW.md \u2014 REVISE, 9 findings folded; SPEC-AUDIT.md CONCERNS folded",
+    "2026-11-20T08:09:41Z start wave 1 on feat/workspace-pane-w1",
+    "2026-11-20T08:12:34Z complete wave 1 (#38): vitest 95/95, build clean, Playwright: ws drawer light+dark, members/invites/rename/delete flows"
+  ]
+}

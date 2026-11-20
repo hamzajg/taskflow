@@ -5,6 +5,7 @@ import com.taskflow.model.User;
 import com.taskflow.security.SessionClaims;
 import com.taskflow.service.AuthService;
 import com.taskflow.service.ProjectService;
+import com.taskflow.service.TagService;
 import com.taskflow.service.WorkspaceService;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
@@ -37,10 +38,15 @@ public class ProjectResource {
     @Inject
     WorkspaceService workspaceService;
 
-    public record CreateProjectRequest(@NotBlank String name, String description, String color) {
+    @Inject
+    TagService tagService;
+
+    public record CreateProjectRequest(@NotBlank String name, String description, String color,
+                                       List<Long> tagIds) {
     }
 
-    public record UpdateProjectRequest(String name, String description, String color) {
+    public record UpdateProjectRequest(String name, String description, String color,
+                                       List<Long> tagIds) {
     }
 
     @GET
@@ -54,7 +60,7 @@ public class ProjectResource {
     public Response create(@PathParam("workspaceId") Long workspaceId,
                            @Valid CreateProjectRequest req) {
         ProjectDto dto = projectService.create(currentUser(), workspaceId,
-                req.name(), req.description(), req.color());
+                req.name(), req.description(), req.color(), req.tagIds());
         return Response.status(Response.Status.CREATED).entity(dto).build();
     }
 
@@ -63,14 +69,16 @@ public class ProjectResource {
     @Operation(summary = "Get a project")
     public ProjectDto get(@PathParam("id") Long id) {
         var ref = projectService.requireProject(id, currentUser().id);
-        return ProjectDto.of(ref.project(), com.taskflow.model.Task.count("projectId", id));
+        return ProjectDto.of(ref.project(), com.taskflow.model.Task.count("projectId", id),
+                tagService.forProject(id));
     }
 
     @PUT
     @Path("/{id}")
     @Operation(summary = "Update a project (owner/admin)")
     public ProjectDto update(@PathParam("id") Long id, @Valid UpdateProjectRequest req) {
-        return projectService.update(currentUser(), id, req.name(), req.description(), req.color());
+        return projectService.update(currentUser(), id, req.name(), req.description(),
+                req.color(), req.tagIds());
     }
 
     @DELETE

@@ -6,6 +6,7 @@ import com.taskflow.model.User;
 import com.taskflow.security.SessionClaims;
 import com.taskflow.service.AuthService;
 import com.taskflow.service.ProjectService;
+import com.taskflow.service.TagService;
 import com.taskflow.service.WorkspaceService;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
@@ -34,12 +35,16 @@ public class ProjectItemResource {
     @Inject
     WorkspaceService workspaceService;
 
+    @Inject
+    TagService tagService;
+
     @GET
     @Path("/{id}")
     @Operation(summary = "Get a project by id")
     public ProjectDto get(@PathParam("id") Long id) {
         var ref = projectService.requireProject(id, currentUser().id);
-        return ProjectDto.of(ref.project(), Task.count("projectId", id));
+        return ProjectDto.of(ref.project(), Task.count("projectId", id),
+                tagService.forProject(id));
     }
 
     private User currentUser() {

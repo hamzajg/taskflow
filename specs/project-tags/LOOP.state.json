@@ -1,8 +1,8 @@
 {
   "feature": "project-tags",
-  "status": "running",
+  "status": "done",
   "iterations": 1,
-  "updated": "2026-11-20T14:18:45Z",
+  "updated": "2026-11-20T14:22:26Z",
   "waves": {
     "1": {
       "status": "done",
@@ -40,6 +40,7 @@
     "2026-11-20T14:11:24Z start wave 2 on feat/project-tags-w2",
     "2026-11-20T14:17:19Z complete wave 2: vitest 130/130 + build clean; evidence 20261120T141526Z-f83f87e verified (6 screenshots)",
     "2026-11-20T14:17:55Z start wave 3 on feat/project-tags-w3",
-    "2026-11-20T14:18:45Z complete wave 3: vitest 131/131 + build clean; evidence 20261120T141826Z-697a3d7 verified"
+    "2026-11-20T14:18:45Z complete wave 3: vitest 131/131 + build clean; evidence 20261120T141826Z-697a3d7 verified",
+    "2026-11-20T14:22:26Z feature validated and shipped"
   ]
 }

@@ -1,8 +1,8 @@
 # Delivery Loop — project-tags
 
-Status: running
+Status: done
 Iterations: 1
-Updated: 2026-11-20T14:18:45Z
+Updated: 2026-11-20T14:22:26Z
 
 | Wave | Status | Branch | PR | Evidence | Updated |
 |------|--------|--------|----|----------|---------|
@@ -25,3 +25,4 @@ Updated: 2026-11-20T14:18:45Z
 - 2026-11-20T14:17:19Z complete wave 2: vitest 130/130 + build clean; evidence 20261120T141526Z-f83f87e verified (6 screenshots)
 - 2026-11-20T14:17:55Z start wave 3 on feat/project-tags-w3
 - 2026-11-20T14:18:45Z complete wave 3: vitest 131/131 + build clean; evidence 20261120T141826Z-697a3d7 verified
+- 2026-11-20T14:22:26Z feature validated and shipped

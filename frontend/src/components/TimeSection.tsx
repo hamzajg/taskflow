@@ -4,19 +4,20 @@ import { getUser } from '../auth'
 import Alert from './Alert'
 import Button from './Button'
 import Input from './Input'
-import { TimeEntryDto, TimeEntryList } from '../pages/projectTypes'
+import { formatMinutes, TimeEntryDto, TimeEntryList } from '../pages/projectTypes'
 
 interface Props {
   taskId: number
   canModerate: boolean
+  onChanged?: () => void
 }
 
-function formatMinutes(minutes: number | null): string {
-  if (minutes == null) return '—'
-  const h = Math.floor(minutes / 60)
-  const m = minutes % 60
-  if (h === 0) return `${m}m`
-  return m === 0 ? `${h}h` : `${h}h ${m}m`
+function byDateDesc(a: TimeEntryDto, b: TimeEntryDto): number {
+  return (
+    b.entryDate.localeCompare(a.entryDate) ||
+    b.createdAt.localeCompare(a.createdAt) ||
+    b.id - a.id
+  )
 }
 
 function formatElapsed(startedAt: string, now: number): string {
@@ -34,7 +35,7 @@ function todayLocal(): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 
-export default function TimeSection({ taskId, canModerate }: Props) {
+export default function TimeSection({ taskId, canModerate, onChanged }: Props) {
   const me = getUser()
   const [entries, setEntries] = useState<TimeEntryDto[] | null>(null)
   const [running, setRunning] = useState<TimeEntryDto | null>(null)
@@ -89,9 +90,10 @@ export default function TimeSection({ taskId, canModerate }: Props) {
         minutes: mins,
         description: description.trim() || undefined,
       })
-      setEntries((prev) => [created, ...(prev ?? [])])
+      setEntries((prev) => [...(prev ?? []), created].sort(byDateDesc))
       setMinutes('')
       setDescription('')
+      onChanged?.()
     } catch (err) {
       setActionError(err instanceof ApiError ? err.message : 'Failed to log time')
     } finally {
@@ -106,7 +108,8 @@ export default function TimeSection({ taskId, canModerate }: Props) {
         `/tasks/${taskId}/time-entries/timer/start`,
       )
       setRunning(created)
-      setEntries((prev) => [created, ...(prev ?? [])])
+      setEntries((prev) => [...(prev ?? []), created].sort(byDateDesc))
+      onChanged?.()
       setNow(Date.now())
     } catch (err) {
       setActionError(err instanceof ApiError ? err.message : 'Failed to start timer')
@@ -122,6 +125,7 @@ export default function TimeSection({ taskId, canModerate }: Props) {
       setEntries((prev) =>
         (prev ?? []).map((en) => (en.id === stopped.id ? stopped : en)),
       )
+      onChanged?.()
     } catch (err) {
       setActionError(err instanceof ApiError ? err.message : 'Failed to stop timer')
     }
@@ -146,6 +150,7 @@ export default function TimeSection({ taskId, canModerate }: Props) {
       })
       setEntries((prev) => (prev ?? []).map((en) => (en.id === entryId ? updated : en)))
       setEditingId(null)
+      onChanged?.()
     } catch (err) {
       setActionError(err instanceof ApiError ? err.message : 'Failed to save entry')
     }
@@ -156,6 +161,7 @@ export default function TimeSection({ taskId, canModerate }: Props) {
     try {
       await api.delete(`/time-entries/${entryId}`)
       setEntries((prev) => (prev ?? []).filter((en) => en.id !== entryId))
+      onChanged?.()
     } catch (err) {
       setActionError(err instanceof ApiError ? err.message : 'Failed to delete entry')
     }

@@ -18,6 +18,7 @@ import TaskCreateDrawer from './TaskCreateDrawer'
 import TaskDrawer from './TaskDrawer'
 import { useShell } from '../shell/ShellContext'
 import {
+  formatMinutes,
   MemberDto,
   ProjectDto,
   statusLabel,
@@ -190,6 +191,8 @@ export default function ProjectDetailPage() {
     items: (tasks ?? []).filter((t) => t.status === status),
   })).filter((g) => g.items.length > 0)
 
+  const projectTotal = (tasks ?? []).reduce((sum, t) => sum + (t.totalMinutes ?? 0), 0)
+
   return (
     <>
       <PageHeader
@@ -220,6 +223,9 @@ export default function ProjectDetailPage() {
         title="Tasks"
         actions={
           <>
+            {projectTotal > 0 && (
+              <span className="muted">Total time: {formatMinutes(projectTotal)}</span>
+            )}
             <ViewToggle view={view} onChange={switchView} />
             <Button size="sm" onClick={openCreateDrawer}>
               Add task

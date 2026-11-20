@@ -5,6 +5,7 @@ import Button from '../components/Button'
 import Input from '../components/Input'
 import Select from '../components/Select'
 import {
+  formatMinutes,
   priorityTone,
   statusLabel,
   TASK_STATUSES,
@@ -161,6 +162,11 @@ export default function BoardView({
                           </span>
                           {t.dueDate && (
                             <span className="muted">Due {t.dueDate}</span>
+                          )}
+                          {(t.totalMinutes ?? 0) > 0 && (
+                            <span className="muted">
+                              {formatMinutes(t.totalMinutes)} logged
+                            </span>
                           )}
                         </div>
                       </div>

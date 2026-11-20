@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import Badge from './Badge'
 import Button from './Button'
 import TaskFormFields, { TaskFormValue } from './TaskFormFields'
-import { MemberDto, priorityTone, TaskDto } from '../pages/projectTypes'
+import { formatMinutes, MemberDto, priorityTone, TaskDto } from '../pages/projectTypes'
 
 export default function TaskItem({
   task,
@@ -62,6 +62,9 @@ export default function TaskItem({
               <Badge tone={priorityTone(task.priority)}>{task.priority}</Badge>
               <span className="muted">{task.assigneeName ?? 'Unassigned'}</span>
               {task.dueDate && <span className="muted">Due {task.dueDate}</span>}
+              {(task.totalMinutes ?? 0) > 0 && (
+                <span className="muted">{formatMinutes(task.totalMinutes)} logged</span>
+              )}
             </div>
           </div>
           <div className="task-actions">

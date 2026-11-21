@@ -4,6 +4,13 @@
 
 | AC | Criterion | Scenarios | Wave(s) | Test evidence |
 |----|-----------|-----------|---------|---------------|
+| 1 | On `/account`, clicking a workspace name opens a right-side… | Manage drawer shows permitted actions per role, Sidebar switching never opens the drawer, Sidebar workspace switching still works, Workspace name opens the management drawer | 1 | workspace-pane.test.tsx |
+| 2 | "New workspace" opens a creation drawer (Scenarios: New… | Creating a workspace closes the drawer and updates the list, New workspace opens the creation drawer | 2 | workspace-pane.test.tsx |
+| 3 | The inline "New workspace" form and the inline members… | Account page shows no inline workspace forms | 2 | workspace-pane.test.tsx |
+| 4 | Delete uses an inline two-step confirm inside the drawer… | Delete uses an inline confirm and resets a dangling selection, Members load failure alerts with retry inside the drawer, Workspace mutations happen inside the drawer | 1 | workspace-pane.test.tsx |
+| 5 | Workspace drawer errors (members load failure… | Members load failure alerts with retry inside the drawer, Workspace mutations happen inside the drawer | 1 | workspace-pane.test.tsx |
+| 6 | `AccountPage` delegates profile editing to `ProfileForm`… | AccountPage delegates profile editing to ProfileForm | 3 | decomposition.test.ts |
+| 7 | Tests and build stay green; evidence covers both themes… | Account page shows no inline workspace forms, AccountPage delegates profile editing to ProfileForm, Creating a workspace closes the drawer and updates the list, Delete uses an inline confirm and resets a dangling selection, Dismissing the manage drawer preserves state, Manage drawer shows permitted actions per role, Members load failure alerts with retry inside the drawer, New workspace opens the creation drawer, Sidebar switching never opens the drawer, Sidebar workspace switching still works, Workspace create errors stay inside the drawer, Workspace drawers meet the accessibility bar in both themes, Workspace mutations happen inside the drawer, Workspace name opens the management drawer | 1, 2, 3 | decomposition.test.ts, workspace-pane.test.tsx |
 
 ## Scenario coverage
 
@@ -36,7 +43,16 @@
 
 Note: 'no evidence' means neither the scenario name nor a
 token match was found in test files — verify by hand before
-treating it as a real gap. '~' marks weak token-match evidence.
+treating it as a real gap. '~' marks weak token-match evidence,
+which is not proof: ship_loop finish requires strong test
+evidence or a `## Manual verification` entry per AC.
+
+## Manual verification
+
+<!-- For ACs without strong automated evidence, one bullet per
+     AC: `- AC <n> — <command/check run> → <observed result>`.
+     Preserved across ship_validate reruns; the delivery auditor
+     still verifies each claim. -->
 
 ## Outcome follow-up
 

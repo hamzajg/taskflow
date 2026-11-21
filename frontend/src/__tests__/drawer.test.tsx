@@ -161,7 +161,7 @@ describe('Task drawer — "Task title opens the drawer from list view" (@w1)', (
     expect(loc()).toBe('/projects/5?task=11')
   })
 
-  it('board card title opens the same drawer', async () => {
+  it('Board card opens the drawer — same drawer as the list view', async () => {
     renderAt('/projects')
     await openListView()
     fireEvent.click(screen.getByRole('button', { name: 'Board' }))

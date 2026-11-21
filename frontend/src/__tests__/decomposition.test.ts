@@ -52,7 +52,7 @@ describe('SRP — "CommentThread is shared, not duplicated" (@w2)', () => {
   })
 })
 
-describe('SRP — "ProfilePage delegates profile editing to ProfileForm" (@w3)', () => {
+describe('SRP — "AccountPage delegates profile editing to ProfileForm" (@w3)', () => {
   it('ProfilePage contains no form markup or profile submit logic', () => {
     const page = read('pages/ProfilePage.tsx')
     expect(page).not.toContain('<form')

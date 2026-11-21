@@ -85,28 +85,28 @@ profile state, workspace rendering, and alerts in one component.
 
 ## Acceptance criteria
 
-1. On `/account`, clicking a workspace name opens a right-side drawer
+1. On `/account`, clicking a workspace name opens a right-side drawer (Scenarios: Workspace name opens the management drawer; Manage drawer shows permitted actions per role; Sidebar switching never opens the drawer; Sidebar workspace switching still works)
    with that workspace's members, roles, pending invites, and the
    permitted management actions (rename for owner/admin, delete for
    owner, remove-member for owner/admin on non-owners). Clicking a name
    also sets that workspace active; sidebar switching never opens a
    drawer.
-2. "New workspace" opens a creation drawer; submitting creates the
+2. "New workspace" opens a creation drawer (Scenarios: New workspace opens the creation drawer; Creating a workspace closes the drawer and updates the list); submitting creates the
    workspace, closes the drawer and the list refreshes.
-3. The inline "New workspace" form and the inline members subpanel are
+3. The inline "New workspace" form and the inline members subpanel are (Scenarios: Account page shows no inline workspace forms)
    removed; the account page shows only the workspace list, profile card
    and drawers.
-4. Delete uses an inline two-step confirm inside the drawer; after
+4. Delete uses an inline two-step confirm inside the drawer (Scenarios: Delete uses an inline confirm and resets a dangling selection; Members load failure alerts with retry inside the drawer; Workspace mutations happen inside the drawer); after
    deleting the active workspace the selection resets. Members-load
    failure alerts with retry inside the drawer; mutation errors alert
    inside the drawer with values preserved; member-role users never see
    invite fetch errors.
-5. Workspace drawer errors (members load failure, invite/rename/delete
+5. Workspace drawer errors (members load failure, invite/rename/delete (Scenarios: Workspace mutations happen inside the drawer; Members load failure alerts with retry inside the drawer)
    failures) surface inside the drawer without losing context.
-6. `AccountPage` delegates profile editing to `ProfileForm`; the page
+6. `AccountPage` delegates profile editing to `ProfileForm` (Scenarios: AccountPage delegates profile editing to ProfileForm); the page
    itself contains no form markup and the "Save profile" label is
    unchanged.
-7. Tests and build stay green; evidence covers both themes; new tests
+7. Tests and build stay green; evidence covers both themes; new tests (@w1 @w2 @w3)
    cover the drawer flows (no existing tests assumed the inline forms).
 
 ## Decisions (preliminary — challenged in DECISION-REVIEW.md)

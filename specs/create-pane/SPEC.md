@@ -74,24 +74,24 @@ home for focused create/edit flows — but creation still bypasses it.
 
 ## Acceptance criteria
 
-1. On a project page, "Add task" opens the right drawer with the task
+1. On a project page, "Add task" opens the right drawer with the task (Scenarios: Add task opens the creation drawer; Creating a task closes the drawer and updates the list)
    form; submitting creates the task, closes and resets the drawer, and
    the task appears in the list (correct status group).
-2. Create-form validation and API errors display inside the drawer;
+2. Create-form validation and API errors display inside the drawer (Scenarios: Create errors stay inside the drawer with values preserved; Create form resets on every open);
    entered values are preserved on failure; submit is disabled while in
    flight; reopening the drawer always starts from a blank form.
-3. Escape, overlay click, close button and Cancel all dismiss without
+3. Escape, overlay click, close button and Cancel all dismiss without (Scenarios: Dismissing the create drawer creates nothing; Only one drawer is open at a time)
    creating; focus returns to the invoking button. Only one drawer can be
    open at a time — opening create while peek is open closes peek.
-4. On the projects page, "New project" opens the same drawer pattern with
+4. On the projects page, "New project" opens the same drawer pattern with (Scenarios: New project opens the creation drawer; Creating a project closes the drawer and updates the list)
    name/description/color; submitting creates and the project appears in
    the workspace project list with the same payload normalization as
    before (empty optional fields omitted).
-5. The inline "New task" card and inline project-create form are removed;
+5. The inline "New task" card and inline project-create form are removed (Scenarios: Inline creation forms are gone);
    pages contain no permanent creation forms.
-6. Both creation drawers meet the drawer accessibility bar (they inherit
+6. Both creation drawers meet the drawer accessibility bar (Scenarios: Creation drawers meet the accessibility bar in both themes) (they inherit
    the `Drawer` primitive) and work in both themes.
-7. Tests and build stay green; evidence covers both themes. Existing
+7. Tests and build stay green; evidence covers both themes (@w1 @w2 @w3). Existing
    tests that assume inline forms (`drawer.test.tsx` "New task" card text,
    `projects.test.tsx` create-form flow) are migrated to open the drawer
    first.

@@ -86,26 +86,26 @@ cannot be reused anywhere else.
 
 ## Acceptance criteria
 
-1. Clicking a task title in list view or a card in board view opens the
+1. Clicking a task title in list view or a card in board view opens the (Scenarios: Task title opens the drawer from list view; Board card opens the drawer)
    drawer; the project page stays mounted underneath.
-2. The drawer shows the task's title, description, status, priority,
+2. The drawer shows the task's title, description, status, priority (Scenarios: Drawer shows fields and comment thread),
    assignee, due date and the full comment thread with post/edit/delete —
    identical behavior to the detail page.
-3. Escape, overlay click, and a visible close control all dismiss the
+3. Escape, overlay click, and a visible close control all dismiss the (Scenarios: Drawer dismisses via escape, overlay and close button; Drawer meets the accessibility bar in both themes)
    drawer; focus returns to the invoking control; body scroll is locked
    while open and Tab cycles within the panel.
-4. "Open full page" in the drawer navigates to `/tasks/:id`, which renders
+4. "Open full page" in the drawer navigates to `/tasks/:id` (Scenarios: Open full page reaches the canonical detail view; Drawer state lives in the URL), which renders
    the same task and comments. The drawer's open state lives in the URL
    (`/projects/:id?task=<taskId>`) so refresh, share and the browser Back
    button behave correctly.
-5. CommentThread is a single shared component used by both the detail page
+5. CommentThread is a single shared component used by both the detail page (Scenarios: CommentThread is shared, not duplicated)
    and the drawer — no duplicated comment markup or logic.
-6. ProjectDetailPage is decomposed into single-responsibility components;
+6. ProjectDetailPage is decomposed into single-responsibility components (Scenarios: List and board interactions still work after decomposition);
    all existing list/edit/delete/move behaviors still pass their tests.
-7. Drawer and reskinned elements meet the accessibility bar in both
+7. Drawer and reskinned elements meet the accessibility bar in both (Scenarios: Drawer meets the accessibility bar in both themes; Slide transition respects reduced motion)
    themes: labelled controls, visible focus, `role="dialog"`,
    `aria-modal`, keyboard reachable.
-8. Tests and build stay green; UI evidence covers both themes.
+8. Tests and build stay green; UI evidence covers both themes (@w1 @w2 @w3).
 
 ## Decisions (preliminary — challenged in DECISION-REVIEW.md)
 

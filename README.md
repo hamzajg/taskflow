@@ -2,7 +2,7 @@
 
 Workspaces, projects and team productivity platform.
 
-Stack: Quarkus (Java 17) backend + React/TypeScript (Vite) frontend +
+Stack: Quarkus (Java 25) backend + React/TypeScript (Vite) frontend +
 PostgreSQL.
 
 ## Layout
@@ -20,7 +20,7 @@ docker compose up -d db
 
 # 2. backend  (http://localhost:8080)
 cd backend
-# needs JDK 17 + Maven 3.9+
+# needs JDK 25 + Maven 3.9+
 mvn quarkus:dev
 
 # 3. frontend (http://localhost:5173, proxies /auth + /workspaces to :8080)

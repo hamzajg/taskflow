@@ -49,6 +49,10 @@ jobs:
         run: mvn -B test
         working-directory: backend
 
+      # Docs and Dockerfiles are allowed to claim Java 25 only; CI pins it.
+      - name: Docs claim Java 25
+        run: bash .github/scripts/check-java-version-docs.sh
+
   frontend:
     name: Frontend (React)
     runs-on: ubuntu-latest
